@@ -51,4 +51,4 @@ const (
 	TagKMisc = "misc"
 )
 
-var logger = log.New(os.Stderr, "[ehloader]", log.Llongfile | log.LstdFlags)
+var logger = log.New(os.Stderr, "[ehloader]", log.Lshortfile | log.LstdFlags)
