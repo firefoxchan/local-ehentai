@@ -88,7 +88,7 @@ func main ()  {
 				fmt.Printf("  %s\n", string(b))
 			}
 		}
-		printHint()
+		fmt.Printf("\nPlease Input: ")
 	}
 	if err := scanner.Err(); err != nil {
 		fmt.Println(err)
