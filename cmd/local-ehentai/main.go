@@ -41,7 +41,7 @@ func main ()  {
 		searchTags[key][value] = struct{}{}
 	}
 	ret := ehloader.Search(searchTags, offset, limit)
-	fmt.Printf("Search: %d, %d,  %v -> %v\n", offset, limit, search, searchTags)
+	fmt.Printf("Search: %d, %d, %v -> %v\n", offset, limit, search, searchTags)
 	if format == "dense" {
 		for _, g := range ret {
 			b, e := json.Marshal(g)
