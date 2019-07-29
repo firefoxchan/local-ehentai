@@ -43,16 +43,18 @@ func galleries (replaceThumbs bool, thumbs string) func (writer http.ResponseWri
 		genPageLast := true
 		genPageRightJumper := true
 		for p:=fromPage; p<=toPage; p++ {
-			switch p {
-			case 1:
+			if p == 1 {
 				genPageFirst = false
 				genPageLeftJumper = false
-			case 2:
+			}
+			if p == 2 {
 				genPageLeftJumper = false
-			case maxPage:
+			}
+			if p == maxPage {
 				genPageLast = false
 				genPageRightJumper = false
-			case maxPage-1:
+			}
+			if p == maxPage-1 {
 				genPageRightJumper = false
 			}
 			if p >=1 && p <= maxPage {

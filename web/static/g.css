@@ -39,7 +39,7 @@ p.ip{text-align:center;clear:both}
 
 /* rating */
 div.i{float:left;height:15px;width:15px;margin:0 1px;background-repeat:no-repeat}
-div.ir{width:80px;height:16px;background-repeat:no-repeat;background-image:url(https://ehgt.org/g/rt.png)}
+div.ir{width:80px;height:16px;background-repeat:no-repeat;background-image:url(/static/rt.png)}
 div.ir img{width:80px;height:16px}
 div.irr{background-image:url(https://ehgt.org/g/rtr.png)}
 div.irb{background-image:url(https://ehgt.org/g/rtb.png)}

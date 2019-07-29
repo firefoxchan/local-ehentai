@@ -92,6 +92,7 @@
                 </select></div>
         </div>
         -->
+        {{if (gt .Total 0)}}
         <table class="ptt" style="margin:2px auto 0px">
             <tbody>
             <tr>
@@ -123,6 +124,7 @@
             </tr>
             </tbody>
         </table>
+        {{end}}
         <table class="itg glte">
             <tbody>
 
@@ -173,6 +175,7 @@
 
             </tbody>
         </table>
+        {{if (gt .Total 0)}}
         <table class="ptb" style="margin:0px auto 5px">
             <tbody>
             <tr>
@@ -204,6 +207,7 @@
             </tr>
             </tbody>
         </table>
+        {{end}}
     </div>
     <!--
     <p class="ip"><img src="https://ehgt.org/g/mr.gif" class="mr" alt=">"> <a href="https://forums.e-hentai.org/">Visit
