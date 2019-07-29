@@ -2,23 +2,47 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
 	"github.com/firefoxchan/local-ehentai/pkg/ehloader"
+	"github.com/firefoxchan/local-ehentai/pkg/websvr"
 	"os"
+	"os/signal"
 	"strconv"
 	"strings"
+	"syscall"
 )
 
 func main ()  {
 	var (
 		jsonPath string
+		thumbsPath string
 		format string
+		host string
+		pprofHost string
+		mode string
 	)
 	flag.StringVar(&jsonPath, "j", "", "path to eh api json file")
+	flag.StringVar(&thumbsPath, "t", "", "path to thumbs dir")
 	flag.StringVar(&format, "f", "dense", "output format. dense, json")
+	flag.StringVar(&host, "h", "127.0.0.1:8080", "http listen addr")
+	flag.StringVar(&pprofHost, "p", "127.0.0.1:8081", "pprof http listen addr")
+	flag.StringVar(&mode, "m", "http", "start mode. cmd, http")
 	flag.Parse()
+	if jsonPath == "" {
+		if _, e := os.Stat("gdata.json"); e == nil {
+			jsonPath = "gdata.json"
+		}
+	}
+	if thumbsPath == "" {
+		if fi, e := os.Stat("thumbs"); e == nil {
+			if fi.IsDir() {
+				thumbsPath = "thumbs"
+			}
+		}
+	}
 	if jsonPath == "" {
 		flag.PrintDefaults()
 		os.Exit(1)
@@ -26,6 +50,35 @@ func main ()  {
 	if e := ehloader.IndexJson(jsonPath); e != nil {
 		panic(e)
 	}
+	switch mode {
+	case "http":
+		http(host, pprofHost, thumbsPath)
+	case "cmd":
+		cmd(format)
+	default:
+		flag.PrintDefaults()
+		os.Exit(1)
+	}
+}
+
+func http (host string, pprofHost string, thumbs string) {
+	signals := make(chan os.Signal)
+	signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
+	ctx, ctxCancel := context.WithCancel(context.Background())
+	go func() {
+		<-signals
+		ctxCancel()
+	}()
+	if e := websvr.HTTPServer(ctx, websvr.Config{
+		Host:      host,
+		PProfHost: pprofHost,
+		Thumbs:    thumbs,
+	}); e != nil {
+		fmt.Printf("HTTPServer Error: %s\n", e)
+	}
+}
+
+func cmd (format string) {
 	// search
 	scanner := bufio.NewScanner(os.Stdin)
 	printHint := func () {

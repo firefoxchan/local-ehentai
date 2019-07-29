@@ -2,7 +2,6 @@ package ehloader
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"os"
 	"sort"
 	"strings"
@@ -24,14 +23,12 @@ func IndexJson(path string) error {
 		if e != nil {
 			return e
 		}
-		data, e := ioutil.ReadAll(f)
+		dec := json.NewDecoder(f)
+		if e := dec.Decode(&jGalleries); e != nil {
+			_ = f.Close()
+			return e
+		}
 		_ = f.Close()
-		if e != nil {
-			return e
-		}
-		if e := json.Unmarshal(data, &jGalleries); e != nil {
-			return e
-		}
 	}
 	logger.Printf("End Parsing json.\n")
 	galleries = make(map[int]*Gallery, 850000)

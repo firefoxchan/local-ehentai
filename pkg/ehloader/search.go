@@ -14,7 +14,7 @@ func Search (searchTags map[TagK]map[TagV]struct{}, offset, limit int) []*Galler
 			localMatches := make([][]int, 0)
 			for k := range tags {
 				for v := range vs {
-					if match, ok := matchTagV(k, v); ok {
+					if match, ok := matchTagKV(k, v, matchModeLike); ok {
 						localMatches = append(localMatches, match)
 					}
 				}
@@ -23,7 +23,7 @@ func Search (searchTags map[TagK]map[TagV]struct{}, offset, limit int) []*Galler
 		default:
 			if _, ok := tags[k]; ok {
 				for v := range vs {
-					if match, ok := matchTagV(k, v); ok {
+					if match, ok := matchTagKV(k, v, matchModeLike); ok {
 						matches = append(matches, match)
 					}
 				}
@@ -61,7 +61,13 @@ func rSlice (match []int, offset int, limit int) []int {
 	return sliced
 }
 
-func matchTagV (matchK, matchV string) ([]int, bool) {
+type matchMode int
+const (
+	matchModeLike matchMode = 0
+	matchModeEq   matchMode = 1
+)
+
+func matchTagKV(matchK, matchV string, mode matchMode) ([]int, bool) {
 	matchK = strings.ToLower(matchK)
 	matchV = strings.ToLower(matchV)
 	if _, ok := tags[matchK]; !ok {
@@ -69,8 +75,15 @@ func matchTagV (matchK, matchV string) ([]int, bool) {
 		return nil, false
 	}
 	matches := make([][]int, 0)
-	for v, match := range tags[matchK] {
-		if strings.Contains(v, matchV) {
+	switch mode {
+	case matchModeLike:
+		for v, match := range tags[matchK] {
+			if strings.Contains(v, matchV) {
+				matches = append(matches, match)
+			}
+		}
+	case matchModeEq:
+		if match, ok := tags[matchK][matchV]; ok {
 			matches = append(matches, match)
 		}
 	}
@@ -100,7 +113,7 @@ func union (matches [][]int) []int {
 		}
 		for i, match := range matches {
 			if cursors[i] >= len(match) {
-				break
+				continue
 			}
 			if match[cursors[i]] < smallest {
 				smallest = match[cursors[i]]

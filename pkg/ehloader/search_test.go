@@ -15,6 +15,7 @@ func TestIntersect(t *testing.T) {
 func TestUnion(t *testing.T) {
 	matches := [][]int{
 		{1,       5, 5,     11,      200},
+		{},
 		{   2, 3, 5,    10,     100, 200, 1000},
 		{1, 2, 3, 5,    10,          200},
 	}

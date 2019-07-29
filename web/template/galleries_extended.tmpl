@@ -1,0 +1,225 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Local E-Hentai Galleries</title>
+    <link rel="stylesheet" type="text/css" href="/static/g.css">
+    <meta name="description" content="With more than half a million absolutely free hentai doujinshi, manga, cosplay and CG galleries, E-Hentai Galleries is the world's largest free Hentai archive.">
+</head>
+<body>
+<!--
+<div id="nb" class="nosel">
+    <div><a class="nbw" href="https://e-hentai.org/">Front<span class="nbw1"> Page</span></a></div>
+    <div><a href="https://e-hentai.org/watched">Watched</a></div>
+    <div><a href="https://e-hentai.org/popular">Popular</a></div>
+    <div><a href="https://e-hentai.org/torrents.php">Torrents</a></div>
+    <div><a href="https://e-hentai.org/favorites.php">Fav<span class="nbw1">orite</span>s</a></div>
+    <div><a href="https://e-hentai.org/home.php"><span class="nbw2">My </span>Home</a></div>
+    <div><a href="https://upload.e-hentai.org/manage.php"><span class="nbw2">My </span>Uploads</a></div>
+    <div><a href="https://e-hentai.org/toplist.php">Toplists</a></div>
+    <div><a href="https://e-hentai.org/bounty.php">Bounties</a></div>
+    <div><a href="https://e-hentai.org/news.php">News</a></div>
+    <div><a href="https://forums.e-hentai.org/">Forums</a></div>
+    <div><a href="https://ehwiki.org/">Wiki</a></div>
+    <div><a href="https://hentaiverse.org/" onclick="popUp('https://hentaiverse.org/',1250,720); return false">H<span
+                    class="nbw1">entai</span>V<span class="nbw1">erse</span></a></div>
+</div>
+-->
+<div class="ido">
+    <div id="toppane">
+        <h1 class="ih">E-Hentai Galleries: The Free Hentai Doujinshi, Manga and Image Gallery System</h1>
+        <div id="searchbox" class="idi">
+            <form action="/" method="get" style="margin:0px; padding:0px">
+                <input type="hidden" id="f_cats" name="f_cats" value="{{.FCats}}" disabled="disabled">
+                <table class="itc">
+                    <tbody>
+                    <tr>
+                        <td>
+                            <div id="cat_2" class="cs ct2" onclick="toggle_category(2)" {{if not (index .FCatsM 2)}}data-disabled="1"{{end}}>Doujinshi</div>
+                        </td>
+                        <td>
+                            <div id="cat_4" class="cs ct3" onclick="toggle_category(4)" {{if not (index .FCatsM 4)}}data-disabled="1"{{end}}>Manga</div>
+                        </td>
+                        <td>
+                            <div id="cat_8" class="cs ct4" onclick="toggle_category(8)" {{if not (index .FCatsM 8)}}data-disabled="1"{{end}}>Artist CG</div>
+                        </td>
+                        <td>
+                            <div id="cat_16" class="cs ct5" onclick="toggle_category(16)" {{if not (index .FCatsM 16)}}data-disabled="1"{{end}}>Game CG</div>
+                        </td>
+                        <td>
+                            <div id="cat_512" class="cs cta" onclick="toggle_category(512)" {{if not (index .FCatsM 512)}}data-disabled="1"{{end}}>Western</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div id="cat_256" class="cs ct9" onclick="toggle_category(256)" {{if not (index .FCatsM 256)}}data-disabled="1"{{end}}>Non-H</div>
+                        </td>
+                        <td>
+                            <div id="cat_32" class="cs ct6" onclick="toggle_category(32)" {{if not (index .FCatsM 32)}}data-disabled="1"{{end}}>Image Set</div>
+                        </td>
+                        <td>
+                            <div id="cat_64" class="cs ct7" onclick="toggle_category(64)" {{if not (index .FCatsM 64)}}data-disabled="1"{{end}}>Cosplay</div>
+                        </td>
+                        <td>
+                            <div id="cat_128" class="cs ct8" onclick="toggle_category(128)" {{if not (index .FCatsM 128)}}data-disabled="1"{{end}}>Asian Porn</div>
+                        </td>
+                        <td>
+                            <div id="cat_1" class="cs ct1" onclick="toggle_category(1)" {{if not (index .FCatsM 1)}}data-disabled="1"{{end}}>Misc</div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <p class="nopm">
+                    <input type="text" id="f_search" name="f_search" placeholder="Search Tags" size="50" maxlength="200" value="{{.FSearch}}">
+                    <input type="submit" value="Apply Filter" onclick="search_presubmit()">
+                    <input type="button" value="Clear Filter" onclick="top.location.href='/'; return false">
+                </p>
+                <div id="advdiv" style="display: none;"></div>
+            </form>
+        </div>
+        <div id="fsdiv" class="idi" style="margin-top:10px; display:none"></div>
+        <script type="text/javascript" src="/static/ehg_index.c.js"></script>
+
+    </div>
+    <div style="position:relative; z-index:2"><p class="ip">Showing {{.Total}} results</p>
+        <!--
+        <div id="dms">
+            <div><select onchange="document.location='https://e-hentai.org/?inline_set=dm_' + this.value">
+                    <option value="m">Minimal</option>
+                    <option value="p">Minimal+</option>
+                    <option value="l">Compact</option>
+                    <option value="e" selected="selected">Extended</option>
+                    <option value="t">Thumbnail</option>
+                </select></div>
+        </div>
+        -->
+        <table class="ptt" style="margin:2px auto 0px">
+            <tbody>
+            <tr>
+                {{if (gt .Page 1)}}
+                    <td {{if (ne 1 $.Page)}}onclick="document.location=this.firstChild.href" {{else}}class="ptds"{{end}}><a href="/?page={{(call $.AddI .Page -1)}}&f_search={{$.FSearch}}&f_cats={{$.FCats}}" onclick="return false"><</a></td>
+                {{end}}
+                {{if .GenPageFirst}}
+                    <td {{if (ne 1 .Page)}}onclick="document.location=this.firstChild.href" {{else}}class="ptds"{{end}}><a href="/?page=0&f_search={{$.FSearch}}&f_cats={{$.FCats}}" onclick="return false">1</a></td>
+                {{end}}
+                {{if .GenPageLeftJumper}}
+                    <td onclick="var page=prompt('Jump to page: (1-{{.MaxPage}})', {{.Page}}); if(page != null) document.location='/?page='+Math.min({{.MaxPage}}, Math.max(0, page - 1))+'&f_search={{$.FSearch}}&f_cats={{$.FCats}}'">
+                        ...
+                    </td>
+                {{end}}
+                {{range .Pages}}
+                    <td {{if (ne . $.Page)}}onclick="document.location=this.firstChild.href" {{else}}class="ptds"{{end}}><a href="/?page={{(call $.AddI . -1)}}&f_search={{$.FSearch}}&f_cats={{$.FCats}}" onclick="return false">{{.}}</a></td>
+                {{end}}
+                {{if .GenPageRightJumper}}
+                    <td onclick="var page=prompt('Jump to page: (1-{{.MaxPage}})', {{.Page}}); if(page != null) document.location='/?page='+Math.min({{.MaxPage}}, Math.max(0, page - 1))+'&f_search={{$.FSearch}}&f_cats={{$.FCats}}'">
+                        ...
+                    </td>
+                {{end}}
+                {{if .GenPageLast}}
+                    <td {{if (ne .MaxPage .Page)}}onclick="document.location=this.firstChild.href" {{else}}class="ptds"{{end}}><a href="/?page={{(call $.AddI .MaxPage -1)}}&f_search={{$.FSearch}}&f_cats={{$.FCats}}" onclick="return false">{{.MaxPage}}</a></td>
+                {{end}}
+                {{if (lt .Page .MaxPage)}}
+                    <td {{if (ne .MaxPage $.Page)}}onclick="document.location=this.firstChild.href" {{else}}class="ptds"{{end}}><a href="/?page={{(call $.AddI .Page -1)}}&f_search={{$.FSearch}}&f_cats={{$.FCats}}" onclick="return false">></a></td>
+                {{end}}
+            </tr>
+            </tbody>
+        </table>
+        <table class="itg glte">
+            <tbody>
+
+            {{range .Galleries}}
+            <tr data-new="1">
+                <td class="gl1e" style="width:250px">
+                    <div style="height:340px;width:250px"><img
+                                    style="height:356px;width:250px;top:-8px"
+                                    alt="{{.Title}}"
+                                    title="{{.Title}}"
+                                    src="{{(call $.GenThumb .Thumb)}}">
+                    </div>
+                </td>
+                <td class="gl2e">
+                    <div>
+                        <div class="gl3e">
+                            <div class="cn {{index $.CategoryToCt .Category}}">{{.Category}}</div>
+                            <div class="glnew"
+                                 id="posted_{{.GId}}">{{.Posted.Format "2006-01-02 15:04:05"}}
+                            </div>
+                            <div class="ir" style="{{(call $.GenRatingStyle .Rating)}}"><div style="display:none">{{.Rating}}</div></div>
+                            <div><a href="/?f_search=uploader:{{.Uploader}}$">{{.Uploader}}</a></div>
+                            <div>{{.FileCount}} pages{{if .Expunged}}<br/><div style="color: red">Expunged</div>{{end}}</div>
+                        </div>
+                        <div class="gl4e glname" style="min-height:348px">
+                            <div class="glink">{{.Title}}<br/>{{.TitleJpn}}<br/>/g/{{.GId}}/{{.Token}}</div>
+                            <div>
+                                <table>
+                                    <tbody>
+                                    {{range $key, $values := .Tags}}
+                                        <tr>
+                                            <td class="tc">{{$key}}:</td>
+                                            <td>
+                                                {{range $values}}
+                                                    <a href="/?f_search={{$key}}:{{.}}$"><div class="gtl" title="{{$key}}:{{.}}">{{.}}</div></a>
+                                                {{end}}
+                                            </td>
+                                        </tr>
+                                    {{end}}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            {{end}}
+
+            </tbody>
+        </table>
+        <table class="ptb" style="margin:0px auto 5px">
+            <tbody>
+            <tr>
+                {{if (gt .Page 1)}}
+                    <td {{if (ne 1 $.Page)}}onclick="document.location=this.firstChild.href" {{else}}class="ptds"{{end}}><a href="/?page={{(call $.AddI .Page -1)}}&f_search={{$.FSearch}}&f_cats={{$.FCats}}" onclick="return false"><</a></td>
+                {{end}}
+                {{if .GenPageFirst}}
+                    <td {{if (ne 1 .Page)}}onclick="document.location=this.firstChild.href" {{else}}class="ptds"{{end}}><a href="/?page=0&f_search={{$.FSearch}}&f_cats={{$.FCats}}" onclick="return false">1</a></td>
+                {{end}}
+                {{if .GenPageLeftJumper}}
+                    <td onclick="var page=prompt('Jump to page: (1-{{.MaxPage}})', {{.Page}}); if(page != null) document.location='/?page='+Math.min({{.MaxPage}}, Math.max(0, page - 1))+'&f_search={{$.FSearch}}&f_cats={{$.FCats}}'">
+                        ...
+                    </td>
+                {{end}}
+                {{range .Pages}}
+                    <td {{if (ne . $.Page)}}onclick="document.location=this.firstChild.href" {{else}}class="ptds"{{end}}><a href="/?page={{(call $.AddI . -1)}}&f_search={{$.FSearch}}&f_cats={{$.FCats}}" onclick="return false">{{.}}</a></td>
+                {{end}}
+                {{if .GenPageRightJumper}}
+                    <td onclick="var page=prompt('Jump to page: (1-{{.MaxPage}})', {{.Page}}); if(page != null) document.location='/?page='+Math.min({{.MaxPage}}, Math.max(0, page - 1))+'&f_search={{$.FSearch}}&f_cats={{$.FCats}}'">
+                        ...
+                    </td>
+                {{end}}
+                {{if .GenPageLast}}
+                    <td {{if (ne .MaxPage .Page)}}onclick="document.location=this.firstChild.href" {{else}}class="ptds"{{end}}><a href="/?page={{(call $.AddI .MaxPage -1)}}&f_search={{$.FSearch}}&f_cats={{$.FCats}}" onclick="return false">{{.MaxPage}}</a></td>
+                {{end}}
+                {{if (lt .Page .MaxPage)}}
+                    <td {{if (ne .MaxPage $.Page)}}onclick="document.location=this.firstChild.href" {{else}}class="ptds"{{end}}><a href="/?page={{(call $.AddI .Page -1)}}&f_search={{$.FSearch}}&f_cats={{$.FCats}}" onclick="return false">></a></td>
+                {{end}}
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <!--
+    <p class="ip"><img src="https://ehgt.org/g/mr.gif" class="mr" alt=">"> <a href="https://forums.e-hentai.org/">Visit
+            the E-Hentai Forums</a><img src="https://ehgt.org/g/mr.gif" class="mr" alt=">"> <a
+                href="https://twitter.com/ehentai">E-Hentai @ Twitter</a><img src="https://ehgt.org/g/mr.gif" class="mr"
+                                                                              alt=">"> <a
+                href="https://hentaiverse.org/" onclick="popUp('https://hentaiverse.org/',1250,720); return false">Play
+            the HentaiVerse Minigame</a><img src="https://ehgt.org/g/mr.gif" class="mr" alt=">"> <a
+                href="https://e-hentai.org/lofi/">Lo-Fi Version</a></p>
+    -->
+</div>
+<!--
+<div class="dp">Please read the <a href="https://e-hentai.org/tos.php">Terms of Service</a> before participating with or
+    uploading any content to this site.
+</div>
+-->
+
+</body>
+</html>
