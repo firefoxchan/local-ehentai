@@ -2,15 +2,6 @@
 
 Local E-Hentai Gallery Searcher
 
-### 下载 
-
-[Releases](https://github.com/firefoxchan/local-ehentai/releases)
-
-### 数据文件
-
-gdata.json: [Mega](https://mega.nz/#F!oh1U0SIA!WBUcf3PaOvrfIF238fnbTg)  
-thumbs: [Nyaa](https://sukebei.nyaa.si/view/2770267)
-
 # 使用方法
 
 ## 启动服务
