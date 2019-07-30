@@ -14,7 +14,7 @@ thumbs: [Nyaa](https://sukebei.nyaa.si/view/2770267)
 ### 使用方法
 
 下载解压release中local-ehentai.win.zip后, 将上面的gdata.json放在与exe文件同一目录下, 执行local-ehentai.exe即可  
-待载入完成后访问浏览器http://127.0.0.1:8080/使用
+待载入完成后访问浏览器[http://127.0.0.1:8080](http://127.0.0.1:8080/)使用
 
 ### 搜索规则
 
