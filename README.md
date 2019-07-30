@@ -6,6 +6,8 @@ Local E-Hentai Gallery Searcher (with ~830k galleries' metadada)
 
 # Usage
 
+## Quick Start
+
 1. Download gdata.json from [Mega](https://mega.nz/#F!oh1U0SIA!WBUcf3PaOvrfIF238fnbTg), shared by Sachia Lanlus.
 2. Download & unzip local-ehentai.win.zip ([Releases](https://github.com/firefoxchan/local-ehentai/releases))
 3. Put gdata.json in the same directory with local-ehentai.exe
@@ -37,6 +39,7 @@ If the value ends with $, an exact match will be performed.
 - misc
 
 ### Example
+
 `artist:toyo$, female: swim`  
 Will match  
 (`artist` is `toyo`) AND (`female` contains `swim`)
