@@ -16,9 +16,9 @@ type Config struct {
 	Thumbs    string
 }
 
-var logger = log.New(os.Stderr, "[websvr]", log.Lshortfile | log.LstdFlags)
+var logger = log.New(os.Stderr, "[websvr]", log.Lshortfile|log.LstdFlags)
 
-func HTTPServer (ctx context.Context, config Config) error {
+func HTTPServer(ctx context.Context, config Config) error {
 	if config.Host == "" {
 		return errors.New("host cannot be empty")
 	}
@@ -44,7 +44,7 @@ func HTTPServer (ctx context.Context, config Config) error {
 		}
 	}()
 	<-ctx.Done()
-	c, _ := context.WithTimeout(context.Background(), 5 * time.Second)
+	c, _ := context.WithTimeout(context.Background(), 5*time.Second)
 	if e := svr.Shutdown(c); e != nil {
 		return e
 	}
@@ -53,7 +53,7 @@ func HTTPServer (ctx context.Context, config Config) error {
 
 const thumbsPrefix = "/thumbs/"
 
-func newServerMux (config *Config) (*http.ServeMux, error) {
+func newServerMux(config *Config) (*http.ServeMux, error) {
 	mux := http.NewServeMux()
 	replaceThumbs := false
 	if config.Thumbs != "" {

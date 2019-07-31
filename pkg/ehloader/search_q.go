@@ -1,6 +1,6 @@
 package ehloader
 
-func SearchQ (offset, limit int, qs ...Q) ([]*Gallery, int) {
+func SearchQ(offset, limit int, qs ...Q) ([]*Gallery, int) {
 	match := searchQ(And(qs...))
 	gs := make([]*Gallery, 0, limit)
 	for _, id := range rSlice(match, offset, limit) {
@@ -11,7 +11,7 @@ func SearchQ (offset, limit int, qs ...Q) ([]*Gallery, int) {
 	return gs, len(match)
 }
 
-func searchQ (q Q) []int {
+func searchQ(q Q) []int {
 	switch q.op {
 	case QOpAnd:
 		return searchQAnd(q.subQs)
@@ -25,7 +25,7 @@ func searchQ (q Q) []int {
 	return make([]int, 0, 0)
 }
 
-func searchQAnd (subQs []Q) []int {
+func searchQAnd(subQs []Q) []int {
 	matches := make([][]int, len(subQs))
 	for i, subQ := range subQs {
 		matches[i] = searchQ(subQ)
@@ -33,7 +33,7 @@ func searchQAnd (subQs []Q) []int {
 	return intersect(matches)
 }
 
-func searchQOr (subQs []Q) []int {
+func searchQOr(subQs []Q) []int {
 	matches := make([][]int, len(subQs))
 	for i, subQ := range subQs {
 		matches[i] = searchQ(subQ)
@@ -41,7 +41,7 @@ func searchQOr (subQs []Q) []int {
 	return union(matches)
 }
 
-func searchQMatch (k TagK, v TagV, mode matchMode) []int {
+func searchQMatch(k TagK, v TagV, mode matchMode) []int {
 	switch k {
 	case TagKAll:
 		matches := make([][]int, 0)
@@ -59,10 +59,10 @@ func searchQMatch (k TagK, v TagV, mode matchMode) []int {
 	return make([]int, 0, 0)
 }
 
-func searchQLike (k TagK, v TagV) []int {
+func searchQLike(k TagK, v TagV) []int {
 	return searchQMatch(k, v, matchModeLike)
 }
 
-func searchQEq (k TagK, v TagV) []int {
+func searchQEq(k TagK, v TagV) []int {
 	return searchQMatch(k, v, matchModeEq)
 }

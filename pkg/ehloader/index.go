@@ -15,36 +15,35 @@ var galleries map[int]*Gallery
 var indexMu sync.RWMutex
 var threadNum = 8
 
-
 func ScanJson(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	if atEOF && len(data) == 0 {
 		return 0, nil, nil
 	}
 
-	inColumn:=false
-	level,start,end:=0,0,0
-	for l,s := range data{
-		if s == '"'{
+	inColumn := false
+	level, start, end := 0, 0, 0
+	for l, s := range data {
+		if s == '"' {
 			inColumn = !inColumn
 		}
-		if s == '{' &&!inColumn{
-			if start == 0{
+		if s == '{' && !inColumn {
+			if start == 0 {
 				start = l
 			}
 			level++
 		}
-		if s == '}' &&!inColumn{
+		if s == '}' && !inColumn {
 			level--
-			if level <= 0{
+			if level <= 0 {
 				end = l
 				break
 			}
 		}
 	}
-	if end > start{
-		return end+1, data[start:end+1], nil
+	if end > start {
+		return end + 1, data[start : end+1], nil
 		// We have a full newline-terminated line.
-	}//logger.Println(start,end,level,len(data))
+	} //logger.Println(start,end,level,len(data))
 
 	// If we're at EOF, we have a final, non-terminated line. Return it.
 	if atEOF {
@@ -54,11 +53,11 @@ func ScanJson(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	return 0, nil, nil
 }
 
-func feedJson(feedCh chan string,jsonCh chan JGallery,barrier *sync.WaitGroup){
+func feedJson(feedCh chan string, jsonCh chan JGallery, barrier *sync.WaitGroup) {
 	j := JGallery{}
-	for b := range feedCh{
-		e := json.Unmarshal([]byte(b),&j)
-		if e != nil{
+	for b := range feedCh {
+		e := json.Unmarshal([]byte(b), &j)
+		if e != nil {
 			logger.Println(e)
 			continue
 		}
@@ -67,8 +66,8 @@ func feedJson(feedCh chan string,jsonCh chan JGallery,barrier *sync.WaitGroup){
 	barrier.Done()
 }
 
-func tagJson(jsonCh chan JGallery,barrier *sync.WaitGroup){
-	for j := range jsonCh{
+func tagJson(jsonCh chan JGallery, barrier *sync.WaitGroup) {
+	for j := range jsonCh {
 		gallery := &Gallery{
 			GId:          j.GId,
 			Token:        strings.TrimSpace(j.Token),
@@ -137,8 +136,8 @@ func IndexJson(path string) error {
 	indexMu.Lock()
 	defer indexMu.Unlock()
 	logger.Printf("Start Parsing json.\n")
-	feedCh := make(chan string,2*threadNum)
-	jsonCh := make(chan JGallery,2*threadNum)
+	feedCh := make(chan string, 2*threadNum)
+	jsonCh := make(chan JGallery, 2*threadNum)
 	//jGalleries := make(map[int64]JGallery, 850000)
 	feedBarrier := sync.WaitGroup{}
 	feedBarrier.Add(threadNum)
@@ -146,13 +145,13 @@ func IndexJson(path string) error {
 	tagBarrier.Add(1)
 	galleries = map[int]*Gallery{}
 	tags = map[TagK]map[TagV][]int{}
-	for i:=0;i<threadNum;i++{
-		go feedJson(feedCh,jsonCh,&feedBarrier)
+	for i := 0; i < threadNum; i++ {
+		go feedJson(feedCh, jsonCh, &feedBarrier)
 	}
-	go tagJson(jsonCh,&tagBarrier)
+	go tagJson(jsonCh, &tagBarrier)
 
 	f, e := os.Open(path)
-	f.Seek(1,0)
+	f.Seek(1, 0)
 	//skip first {
 	if e != nil {
 		return e
@@ -162,11 +161,11 @@ func IndexJson(path string) error {
 	b.Split(ScanJson)
 
 	count := 0
-	for b.Scan(){
+	for b.Scan() {
 		feedCh <- b.Text()
 		count++
 		//logger.Println(j)
-		if count%10000 == 0{
+		if count%10000 == 0 {
 			//logger.Println(j)
 			logger.Println(count)
 		}
@@ -176,13 +175,11 @@ func IndexJson(path string) error {
 	//logger.Println(j.GId)
 	logger.Println(count)
 
-
 	logger.Printf("End Parsing json.\n")
 	logger.Printf("Start Loading gallaries.\n")
 	feedBarrier.Wait()
 	close(jsonCh)
 	tagBarrier.Wait()
-
 
 	for _, tagVs := range tags {
 		for value := range tagVs {
@@ -193,7 +190,7 @@ func IndexJson(path string) error {
 	return nil
 }
 
-func BuildKV (pair string, defaultTagK string) (string, string) {
+func BuildKV(pair string, defaultTagK string) (string, string) {
 	pairs := strings.SplitN(pair, ":", 2)
 	var key, value string
 	switch len(pairs) {
@@ -207,7 +204,7 @@ func BuildKV (pair string, defaultTagK string) (string, string) {
 	return key, value
 }
 
-func appendTagKVG (key, value string, gid int) {
+func appendTagKVG(key, value string, gid int) {
 	key = strings.ToLower(key)
 	value = strings.ToLower(value)
 	if _, ok := tags[key]; !ok {

@@ -13,7 +13,7 @@ import (
 	"strings"
 )
 
-func galleries (replaceThumbs bool, thumbs string) func (writer http.ResponseWriter, request *http.Request) {
+func galleries(replaceThumbs bool, thumbs string) func(writer http.ResponseWriter, request *http.Request) {
 	return func(writer http.ResponseWriter, request *http.Request) {
 		tmpl := template.New("galleries_extended.tmpl")
 		t, e := tmpl.ParseFiles("template/galleries_extended.tmpl")
@@ -32,17 +32,17 @@ func galleries (replaceThumbs bool, thumbs string) func (writer http.ResponseWri
 		logger.Printf("Galleries query: %v -> %+v", values, pq)
 		gs, total := ehloader.SearchQ(pq.Offset, pq.Limit, pq.Q)
 		maxPage := total / pq.Limit
-		if total % pq.Limit != 0 {
+		if total%pq.Limit != 0 {
 			maxPage++
 		}
-		fromPage := pq.Page+1 -3
-		toPage := fromPage +7
+		fromPage := pq.Page + 1 - 3
+		toPage := fromPage + 7
 		pages := make([]int, 0)
 		genPageFirst := true
 		genPageLeftJumper := true
 		genPageLast := true
 		genPageRightJumper := true
-		for p:=fromPage; p<=toPage; p++ {
+		for p := fromPage; p <= toPage; p++ {
 			if p == 1 {
 				genPageFirst = false
 				genPageLeftJumper = false
@@ -57,26 +57,26 @@ func galleries (replaceThumbs bool, thumbs string) func (writer http.ResponseWri
 			if p == maxPage-1 {
 				genPageRightJumper = false
 			}
-			if p >=1 && p <= maxPage {
+			if p >= 1 && p <= maxPage {
 				pages = append(pages, p)
 			}
 		}
 		data := map[string]interface{}{
-			"Galleries": gs,
-			"Total": total,
-			"Page": pq.Page+1,
-			"Pages": pages,
-			"GenPageFirst": genPageFirst,
-			"GenPageLast": genPageLast,
-			"GenPageLeftJumper": genPageLeftJumper,
+			"Galleries":          gs,
+			"Total":              total,
+			"Page":               pq.Page + 1,
+			"Pages":              pages,
+			"GenPageFirst":       genPageFirst,
+			"GenPageLast":        genPageLast,
+			"GenPageLeftJumper":  genPageLeftJumper,
 			"GenPageRightJumper": genPageRightJumper,
-			"MaxPage": maxPage,
-			"FSearch": pq.FSearch,
-			"FCats": pq.FCats,
-			"FCatsM": pq.FCatsM,
-			"CategoryToCt": categoriesCtMap,
-			"GenRatingStyle": genRatingStyle,
-			"AddI": func(a int, b int) int { return a + b },
+			"MaxPage":            maxPage,
+			"FSearch":            pq.FSearch,
+			"FCats":              pq.FCats,
+			"FCatsM":             pq.FCatsM,
+			"CategoryToCt":       categoriesCtMap,
+			"GenRatingStyle":     genRatingStyle,
+			"AddI":               func(a int, b int) int { return a + b },
 			"GenThumb": func(u string) string {
 				if replaceThumbs {
 					return genThumbs(u, thumbs)
@@ -93,7 +93,7 @@ func galleries (replaceThumbs bool, thumbs string) func (writer http.ResponseWri
 	}
 }
 
-func genThumbs (u string, dir string) string {
+func genThumbs(u string, dir string) string {
 	parsedUrl, e := url.Parse(u)
 	if e != nil {
 		logger.Printf("Unable to parse url: %s\n", u)
@@ -110,7 +110,7 @@ func genThumbs (u string, dir string) string {
 		logger.Printf("Unable to find thumbs cache: %s\n", u)
 		return u
 	}
-	for _, tail := range []string {
+	for _, tail := range []string{
 		"250.jpg",
 	} {
 		filenames[len(filenames)-1] = tail
@@ -124,7 +124,7 @@ func genThumbs (u string, dir string) string {
 	return u
 }
 
-func genRatingStyle (rating32 float32) string {
+func genRatingStyle(rating32 float32) string {
 	times := 0
 	rating32 -= 5
 	for rating32 < 0 {
@@ -135,21 +135,21 @@ func genRatingStyle (rating32 float32) string {
 		times--
 	}
 	posX := (times / 2) * -16
-	posY := ((times % 2) * -20) -1
+	posY := ((times % 2) * -20) - 1
 	return fmt.Sprintf("background-position:%dpx %dpx", posX, posY)
 }
 
 var categoriesCtMap = map[string]string{
-	"Misc": "ct1",
-	"Doujinshi": "ct2",
-	"Manga": "ct3",
-	"Artist CG": "ct4",
-	"Game CG": "ct5",
-	"Image Set": "ct6",
-	"Cosplay": "ct7",
+	"Misc":       "ct1",
+	"Doujinshi":  "ct2",
+	"Manga":      "ct3",
+	"Artist CG":  "ct4",
+	"Game CG":    "ct5",
+	"Image Set":  "ct6",
+	"Cosplay":    "ct7",
 	"Asian Porn": "ct8",
-	"Non-H": "ct9",
-	"Western": "cta",
+	"Non-H":      "ct9",
+	"Western":    "cta",
 }
 
 var queryCategories = map[int64]string{
@@ -166,16 +166,16 @@ var queryCategories = map[int64]string{
 }
 
 type parsedQuery struct {
-	Page int
-	Offset int
-	Limit int
-	Q ehloader.Q
+	Page    int
+	Offset  int
+	Limit   int
+	Q       ehloader.Q
 	FSearch string
-	FCats int64
-	FCatsM map[int64]bool
+	FCats   int64
+	FCatsM  map[int64]bool
 }
 
-func parseQuery (values url.Values) parsedQuery {
+func parseQuery(values url.Values) parsedQuery {
 	const limit = 10
 	page, _ := strconv.ParseInt(values.Get("page"), 10, 64)
 	offset := page * limit
@@ -185,7 +185,7 @@ func parseQuery (values url.Values) parsedQuery {
 	{
 		categories := make([]string, 0)
 		for mask, category := range queryCategories {
-			if fCats & mask == 0 {
+			if fCats&mask == 0 {
 				fCatsM[mask] = true
 				categories = append(categories, category)
 			} else {
@@ -221,12 +221,12 @@ func parseQuery (values url.Values) parsedQuery {
 		}
 	}
 	return parsedQuery{
-		Page:   int(page),
-		Offset: int(offset),
-		Limit:  limit,
-		Q:      ehloader.And(qs...),
+		Page:    int(page),
+		Offset:  int(offset),
+		Limit:   limit,
+		Q:       ehloader.And(qs...),
 		FSearch: fSearch,
-		FCats: fCats,
-		FCatsM: fCatsM,
+		FCats:   fCats,
+		FCatsM:  fCatsM,
 	}
 }

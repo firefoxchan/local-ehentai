@@ -4,7 +4,7 @@ import (
 	"strings"
 )
 
-func Search (searchTags map[TagK]map[TagV]struct{}, offset, limit int) []*Gallery {
+func Search(searchTags map[TagK]map[TagV]struct{}, offset, limit int) []*Gallery {
 	indexMu.RLock()
 	defer indexMu.RUnlock()
 	matches := make([][]int, 0)
@@ -40,7 +40,7 @@ func Search (searchTags map[TagK]map[TagV]struct{}, offset, limit int) []*Galler
 	return gs
 }
 
-func rSlice (match []int, offset int, limit int) []int {
+func rSlice(match []int, offset int, limit int) []int {
 	from := len(match) - offset - limit
 	to := from + limit
 	if to > len(match) {
@@ -62,6 +62,7 @@ func rSlice (match []int, offset int, limit int) []int {
 }
 
 type matchMode int
+
 const (
 	matchModeLike matchMode = 0
 	matchModeEq   matchMode = 1
@@ -92,7 +93,7 @@ func matchTagKV(matchK, matchV string, mode matchMode) ([]int, bool) {
 	return match, true
 }
 
-func union (matches [][]int) []int {
+func union(matches [][]int) []int {
 	ret := make([]int, 0)
 	if len(matches) == 0 {
 		return ret
@@ -129,7 +130,7 @@ func union (matches [][]int) []int {
 	return ret
 }
 
-func intersect (matches [][]int) []int {
+func intersect(matches [][]int) []int {
 	ret := make([]int, 0)
 	if len(matches) == 0 {
 		return ret

@@ -4,9 +4,9 @@ import "testing"
 
 func TestIntersect(t *testing.T) {
 	matches := [][]int{
-		{   2, 3, 5, 10,     100, 200, 1000},
-		{1, 2, 3, 5, 10,          200},
-		{1,       5,     11,      200},
+		{2, 3, 5, 10, 100, 200, 1000},
+		{1, 2, 3, 5, 10, 200},
+		{1, 5, 11, 200},
 	}
 	target := []int{5, 200}
 	checkMatch(t, target, intersect(matches))
@@ -14,10 +14,10 @@ func TestIntersect(t *testing.T) {
 
 func TestUnion(t *testing.T) {
 	matches := [][]int{
-		{1,       5, 5,     11,      200},
+		{1, 5, 5, 11, 200},
 		{},
-		{   2, 3, 5,    10,     100, 200, 1000},
-		{1, 2, 3, 5,    10,          200},
+		{2, 3, 5, 10, 100, 200, 1000},
+		{1, 2, 3, 5, 10, 200},
 	}
 	target := []int{1, 2, 3, 5, 10, 11, 100, 200, 1000}
 	checkMatch(t, target, union(matches))
@@ -33,7 +33,7 @@ func TestRSlice(t *testing.T) {
 	checkMatch(t, []int{9, 10}, rSlice(match, 9, 3))
 }
 
-func checkMatch (t *testing.T, target, ret []int) {
+func checkMatch(t *testing.T, target, ret []int) {
 	if len(ret) != len(target) {
 		t.Errorf("Mismatch, Target: %v, Ret: %v", target, ret)
 		return

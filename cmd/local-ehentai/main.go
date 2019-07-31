@@ -15,14 +15,14 @@ import (
 	"syscall"
 )
 
-func main ()  {
+func main() {
 	var (
-		jsonPath string
+		jsonPath   string
 		thumbsPath string
-		format string
-		host string
-		pprofHost string
-		mode string
+		format     string
+		host       string
+		pprofHost  string
+		mode       string
 	)
 	flag.StringVar(&jsonPath, "j", "", "path to eh api json file")
 	flag.StringVar(&thumbsPath, "t", "", "path to thumbs dir")
@@ -61,7 +61,7 @@ func main ()  {
 	}
 }
 
-func http (host string, pprofHost string, thumbs string) {
+func http(host string, pprofHost string, thumbs string) {
 	signals := make(chan os.Signal)
 	signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
 	ctx, ctxCancel := context.WithCancel(context.Background())
@@ -78,10 +78,10 @@ func http (host string, pprofHost string, thumbs string) {
 	}
 }
 
-func cmd (format string) {
+func cmd(format string) {
 	// search
 	scanner := bufio.NewScanner(os.Stdin)
-	printHint := func () {
+	printHint := func() {
 		fmt.Printf("Search format: offset, limit, tag1:value1, tag2:value2, ...\n")
 		fmt.Printf("Example: 0, 10, category:doujinshi, parody:the idolmaster\n")
 		fmt.Printf("Quit format: quit\n")
