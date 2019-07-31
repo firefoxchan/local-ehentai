@@ -182,10 +182,11 @@ a:hover .glink{color:#8F4701}
 .gl3e>div:nth-child(1){width:110px;position:absolute;left:6px;top:8px}
 .gl3e>div:nth-child(2){position:absolute;left:5px;top:56px;width:102px;text-align:center;white-space:nowrap;padding:1px 4px;border:2px groove transparent;border-radius:4px;cursor:pointer}
 .gl3e>div:nth-child(3){position:absolute;left:22px;top:83px}
-.gl3e>div:nth-child(4){width:120px;position:absolute;left:3px;top:110px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;text-align:center}
-.gl3e>div:nth-child(5){width:120px;position:absolute;left:3px;top:130px;text-align:center;font-size:8pt}
-.gl3e>div:nth-child(6){position:absolute;left:57px;top:155px;height:15px;width:15px}
-.gl3e>div:nth-child(7){width:120px;position:absolute;left:3px;top:180px;text-align:center;font-size:8pt}
+.gl3e>div:nth-child(4){width:120px;position:absolute;left:3px;top:110px;text-align:center;font-size:8pt}
+.gl3e>div:nth-child(5){width:120px;position:absolute;left:3px;top:130px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;text-align:center}
+.gl3e>div:nth-child(6){width:120px;position:absolute;left:3px;top:150px;text-align:center;font-size:8pt}
+.gl3e>div:nth-child(7){width:120px;position:absolute;left:3px;top:170px;text-align:center;font-size:8pt}
+.gl3e>div:nth-child(8){           position:absolute;left:57px;top:195px;height:15px;width:15px}
 .gl4e{border-left:1px solid #D9D7CC}
 .gl4e>div{min-width:200px;max-width:898px}
 .gl4e>div:nth-child(1){overflow:hidden;min-height:20px;/*max-height:60px;*/line-height:20px;margin:6px 6px 4px 8px;font-size:12pt}

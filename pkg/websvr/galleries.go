@@ -72,6 +72,7 @@ func galleries(replaceThumbs bool, thumbs string) func(writer http.ResponseWrite
 			"GenPageRightJumper": genPageRightJumper,
 			"MaxPage":            maxPage,
 			"Values":             pq.Values,
+			"RawValues":          template.URL(pq.Values.Encode()),
 			"FSearch":            pq.FSearch,
 			"FCats":              pq.FCats,
 			"FCatsM":             pq.FCatsM,
@@ -180,6 +181,7 @@ type parsedQuery struct {
 func parseQuery(values url.Values) parsedQuery {
 	const limit = 10
 	page, _ := strconv.ParseInt(values.Get("page"), 10, 64)
+	values.Del("page")
 	offset := page * limit
 	qs := make([]ehloader.Q, 0)
 	fCats, _ := strconv.ParseInt(values.Get("f_cats"), 10, 64)
