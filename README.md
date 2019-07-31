@@ -27,16 +27,16 @@ If the value ends with $, an exact match will be performed.
 
 ### Valid Tags
 
-- category
-- uploader
-- parody
-- character
-- artist
-- group
-- female
-- male
-- language
-- misc
+- `category`
+- `uploader`
+- `parody`
+- `character`
+- `artist`
+- `group`
+- `female`
+- `male`
+- `language`
+- `misc`
 
 ### Example
 

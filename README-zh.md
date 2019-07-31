@@ -24,16 +24,16 @@ tag留空时会搜索所有tag, value以$结尾时会精确匹配
 
 ### Tag列表
 
-- category
-- uploader
-- parody
-- character
-- artist
-- group
-- female
-- male
-- language
-- misc
+- `category`
+- `uploader`
+- `parody`
+- `character`
+- `artist`
+- `group`
+- `female`
+- `male`
+- `language`
+- `misc`
 
 ### 样例 
 
