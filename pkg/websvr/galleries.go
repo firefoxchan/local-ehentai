@@ -29,7 +29,7 @@ func galleries(replaceThumbs bool, thumbs string) func(writer http.ResponseWrite
 			return
 		}
 		pq := parseQuery(values)
-		logger.Printf("Galleries query: %v -> %+v", values, pq)
+		logger.Printf("Galleries query: %v -> Offset: %d, Limit: %d, Query:\n%s", values, pq.Offset, pq.Limit, pq.Q.Dump("  ", "  "))
 		gs, total := ehloader.SearchQ(pq.Offset, pq.Limit, pq.Q)
 		maxPage := total / pq.Limit
 		if total%pq.Limit != 0 {

@@ -89,7 +89,7 @@ func matchTagKV(matchK, matchV string, mode matchMode) ([]int, bool) {
 		}
 	}
 	match := union(matches)
-	logger.Printf("Match: %s, %s, %d", matchK, matchV, len(match))
+	logger.Printf("Match: %d, %s, %s, %d", mode, matchK, matchV, len(match))
 	return match, true
 }
 

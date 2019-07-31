@@ -69,6 +69,13 @@ func newServerMux(config *Config) (*http.ServeMux, error) {
 		logger.Printf("Enable local thumbs cache\n")
 	}
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
-	mux.HandleFunc("/", galleries(replaceThumbs, config.Thumbs))
+	mux.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
+		switch request.URL.Path {
+		case "/":
+			galleries(replaceThumbs, config.Thumbs)(writer, request)
+		default:
+			http.NotFound(writer, request)
+		}
+	})
 	return mux, nil
 }

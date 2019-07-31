@@ -1,12 +1,7 @@
 package ehloader
 
 import (
-	"bufio"
-	"encoding/json"
 	"math"
-	"os"
-	"runtime"
-	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -17,191 +12,79 @@ var tags map[TagK]map[TagV][]int
 var galleries map[int]*Gallery
 var indexMu sync.RWMutex
 
-func ScanJson(data []byte, atEOF bool) (advance int, token []byte, err error) {
-	if atEOF && len(data) == 0 {
-		return 0, nil, nil
+func handleJGallery(j JGallery) () {
+	gallery := &Gallery{
+		GId:          j.GId,
+		Token:        strings.TrimSpace(j.Token),
+		Title:        strings.TrimSpace(j.Title),
+		TitleJpn:     strings.TrimSpace(j.TitleJpn),
+		Category:     strings.TrimSpace(j.Category),
+		Thumb:        j.Thumb,
+		Uploader:     strings.TrimSpace(j.Uploader),
+		Posted:       time.Time{},
+		FileCount:    0,
+		FileSize:     j.FileSize,
+		Expunged:     j.Expunged,
+		Rating:       0,
+		TorrentCount: 0,
+		Tags:         map[TagK][]TagV{},
 	}
-
-	inColumn := false
-	level, start, end := 0, 0, 0
-	for l, s := range data {
-		if s == '"' {
-			inColumn = !inColumn
-		}
-		if s == '{' && !inColumn {
-			if start == 0 {
-				start = l
-			}
-			level++
-		}
-		if s == '}' && !inColumn {
-			level--
-			if level <= 0 {
-				end = l
-				break
-			}
-		}
-	}
-	if end > start {
-		return end + 1, data[start : end+1], nil
-		// We have a full newline-terminated line.
-	} //logger.Println(start,end,level,len(data))
-
-	// If we're at EOF, we have a final, non-terminated line. Return it.
-	if atEOF {
-		return len(data), nil, nil
-	}
-	// Request more data.
-	return 0, nil, nil
-}
-
-func feedJson(feedCh chan string, jsonCh chan JGallery, barrier *sync.WaitGroup) {
-	j := JGallery{}
-	for b := range feedCh {
-		e := json.Unmarshal([]byte(b), &j)
+	{
+		posted, e := j.Posted.Int64()
 		if e != nil {
-			logger.Printf("Json unmarshal error: %s", e)
-			continue
-		}
-		jsonCh <- j
-	}
-	barrier.Done()
-}
-
-func tagJson(jsonCh chan JGallery, barrier *sync.WaitGroup) {
-	for j := range jsonCh {
-		gallery := &Gallery{
-			GId:          j.GId,
-			Token:        strings.TrimSpace(j.Token),
-			Title:        strings.TrimSpace(j.Title),
-			TitleJpn:     strings.TrimSpace(j.TitleJpn),
-			Category:     strings.TrimSpace(j.Category),
-			Thumb:        j.Thumb,
-			Uploader:     strings.TrimSpace(j.Uploader),
-			Posted:       time.Time{},
-			FileCount:    0,
-			FileSize:     j.FileSize,
-			Expunged:     j.Expunged,
-			Rating:       0,
-			TorrentCount: 0,
-			Tags:         map[TagK][]TagV{},
-		}
-		{
-			posted, e := j.Posted.Int64()
-			if e != nil {
-				logger.Printf("Load gallary %d .posted error: %s\n", j.GId, e)
-			} else {
-				gallery.Posted = time.Unix(posted, 0)
-			}
-		}
-		{
-			fc, e := j.FileCount.Int64()
-			if e != nil {
-				logger.Printf("Load gallary %d .filecount error: %s\n", j.GId, e)
-			} else {
-				gallery.FileCount = int(fc)
-			}
-		}
-		{
-			rt, e := j.Rating.Float64()
-			if e != nil {
-				logger.Printf("Load gallary %d .rating error: %s\n", j.GId, e)
-			} else {
-				gallery.Rating = float32(rt)
-			}
-		}
-		{
-			tc, e := j.TorrentCount.Int64()
-			if e != nil {
-				logger.Printf("Load gallary %d .torrent_count error: %s\n", j.GId, e)
-			} else {
-				gallery.TorrentCount = int(tc)
-			}
-		}
-		// tags
-		for _, pair := range j.Tags {
-			key, value := BuildKV(pair, TagKMisc)
-			appendTagKVG(key, value, j.GId)
-			if _, ok := gallery.Tags[key]; !ok {
-				gallery.Tags[key] = make([]string, 0)
-			}
-			gallery.Tags[key] = append(gallery.Tags[key], value)
-		}
-		// category / uploader
-		appendTagKVG(TagKCategory, gallery.Category, j.GId)
-		appendTagKVG(TagKUploader, gallery.Uploader, j.GId)
-		// expunged
-		switch gallery.Expunged {
-		case true:
-			appendTagKVG(TagKExpunged, TagVExpungedTrue, j.GId)
-		case false:
-			appendTagKVG(TagKExpunged, TagVExpungedFalse, j.GId)
-		}
-		// min rating
-		for i:=int64(0); i<=int64(math.Round(float64(gallery.Rating))); i++ {
-			appendTagKVG(TagKMinRating, strconv.FormatInt(i, 10), j.GId)
-		}
-		galleries[j.GId] = gallery
-	}
-	barrier.Done()
-}
-
-func IndexJson(path string) error {
-	indexMu.Lock()
-	defer indexMu.Unlock()
-
-	var feederNum = int(math.Max(float64(runtime.NumCPU()-2), 1))
-	rawJsonCh := make(chan string, 2*feederNum)
-	jGalleriesCh := make(chan JGallery, 2*feederNum)
-
-	logger.Printf("Start Parsing json (%d gr).\n", feederNum)
-	feedBarrier := sync.WaitGroup{}
-	feedBarrier.Add(feederNum)
-	for i := 0; i < feederNum; i++ {
-		go feedJson(rawJsonCh, jGalleriesCh, &feedBarrier)
-	}
-
-	logger.Printf("Start Loading gallaries.\n")
-	galleries = map[int]*Gallery{}
-	tags = map[TagK]map[TagV][]int{}
-	tagBarrier := sync.WaitGroup{}
-	tagBarrier.Add(1)
-	go tagJson(jGalleriesCh, &tagBarrier)
-
-	f, e := os.Open(path)
-	if e != nil {
-		return e
-	}
-	defer func() { _ = f.Close() }()
-	//skip first {
-	if _, e := f.Seek(1, 0); e != nil {
-		return e
-	}
-
-	b := bufio.NewScanner(f)
-	b.Split(ScanJson)
-
-	count := 0
-	for b.Scan() {
-		rawJsonCh <- b.Text()
-		count++
-		if count%10000 == 0 {
-			logger.Printf("Parsed %d gallaries.\n", count)
+			logger.Printf("Load gallary %d .posted error: %s\n", j.GId, e)
+		} else {
+			gallery.Posted = time.Unix(posted, 0)
 		}
 	}
-	close(rawJsonCh)
-	feedBarrier.Wait()
-	logger.Printf("Parsed %d gallaries.\n", count)
-	logger.Printf("End Parsing json.\n")
-	close(jGalleriesCh)
-	tagBarrier.Wait()
-	for _, tagVs := range tags {
-		for value := range tagVs {
-			sort.Ints(tagVs[value])
+	{
+		fc, e := j.FileCount.Int64()
+		if e != nil {
+			logger.Printf("Load gallary %d .filecount error: %s\n", j.GId, e)
+		} else {
+			gallery.FileCount = int(fc)
 		}
 	}
-	logger.Printf("End Loading gallaries.\n")
-	return nil
+	{
+		rt, e := j.Rating.Float64()
+		if e != nil {
+			logger.Printf("Load gallary %d .rating error: %s\n", j.GId, e)
+		} else {
+			gallery.Rating = float32(rt)
+		}
+	}
+	{
+		tc, e := j.TorrentCount.Int64()
+		if e != nil {
+			logger.Printf("Load gallary %d .torrent_count error: %s\n", j.GId, e)
+		} else {
+			gallery.TorrentCount = int(tc)
+		}
+	}
+	// tags
+	for _, pair := range j.Tags {
+		key, value := BuildKV(pair, TagKMisc)
+		appendTagKVG(key, value, j.GId)
+		if _, ok := gallery.Tags[key]; !ok {
+			gallery.Tags[key] = make([]string, 0)
+		}
+		gallery.Tags[key] = append(gallery.Tags[key], value)
+	}
+	// category / uploader
+	appendTagKVG(TagKCategory, gallery.Category, j.GId)
+	appendTagKVG(TagKUploader, gallery.Uploader, j.GId)
+	// expunged
+	switch gallery.Expunged {
+	case true:
+		appendTagKVG(TagKExpunged, TagVExpungedTrue, j.GId)
+	case false:
+		appendTagKVG(TagKExpunged, TagVExpungedFalse, j.GId)
+	}
+	// min rating
+	for i:=int64(0); i<=int64(math.Round(float64(gallery.Rating))); i++ {
+		appendTagKVG(TagKMinRating, strconv.FormatInt(i, 10), j.GId)
+	}
+	galleries[j.GId] = gallery
 }
 
 func BuildKV(pair string, defaultTagK string) (string, string) {
