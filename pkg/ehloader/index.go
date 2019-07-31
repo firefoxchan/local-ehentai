@@ -3,7 +3,9 @@ package ehloader
 import (
 	"bufio"
 	"encoding/json"
+	"math"
 	"os"
+	"runtime"
 	"sort"
 	"strings"
 	"sync"
@@ -13,7 +15,6 @@ import (
 var tags map[TagK]map[TagV][]int
 var galleries map[int]*Gallery
 var indexMu sync.RWMutex
-var threadNum = 8
 
 func ScanJson(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	if atEOF && len(data) == 0 {
@@ -58,7 +59,7 @@ func feedJson(feedCh chan string, jsonCh chan JGallery, barrier *sync.WaitGroup)
 	for b := range feedCh {
 		e := json.Unmarshal([]byte(b), &j)
 		if e != nil {
-			logger.Println(e)
+			logger.Printf("Json unmarshal error: %s", e)
 			continue
 		}
 		jsonCh <- j
@@ -127,7 +128,6 @@ func tagJson(jsonCh chan JGallery, barrier *sync.WaitGroup) {
 		appendTagKVG(TagKCategory, gallery.Category, j.GId)
 		appendTagKVG(TagKUploader, gallery.Uploader, j.GId)
 		galleries[j.GId] = gallery
-		//delete(jGalleries, i)
 	}
 	barrier.Done()
 }
@@ -135,25 +135,32 @@ func tagJson(jsonCh chan JGallery, barrier *sync.WaitGroup) {
 func IndexJson(path string) error {
 	indexMu.Lock()
 	defer indexMu.Unlock()
-	logger.Printf("Start Parsing json.\n")
-	feedCh := make(chan string, 2*threadNum)
-	jsonCh := make(chan JGallery, 2*threadNum)
-	//jGalleries := make(map[int64]JGallery, 850000)
+
+	var feederNum = int(math.Max(float64(runtime.NumCPU()-2), 1))
+	rawJsonCh := make(chan string, 2*feederNum)
+	jGalleriesCh := make(chan JGallery, 2*feederNum)
+
+	logger.Printf("Start Parsing json (%d gr).\n", feederNum)
 	feedBarrier := sync.WaitGroup{}
-	feedBarrier.Add(threadNum)
-	tagBarrier := sync.WaitGroup{}
-	tagBarrier.Add(1)
+	feedBarrier.Add(feederNum)
+	for i := 0; i < feederNum; i++ {
+		go feedJson(rawJsonCh, jGalleriesCh, &feedBarrier)
+	}
+
+	logger.Printf("Start Loading gallaries.\n")
 	galleries = map[int]*Gallery{}
 	tags = map[TagK]map[TagV][]int{}
-	for i := 0; i < threadNum; i++ {
-		go feedJson(feedCh, jsonCh, &feedBarrier)
-	}
-	go tagJson(jsonCh, &tagBarrier)
+	tagBarrier := sync.WaitGroup{}
+	tagBarrier.Add(1)
+	go tagJson(jGalleriesCh, &tagBarrier)
 
 	f, e := os.Open(path)
-	f.Seek(1, 0)
-	//skip first {
 	if e != nil {
+		return e
+	}
+	defer func() { _ = f.Close() }()
+	//skip first {
+	if _, e := f.Seek(1, 0); e != nil {
 		return e
 	}
 
@@ -162,25 +169,18 @@ func IndexJson(path string) error {
 
 	count := 0
 	for b.Scan() {
-		feedCh <- b.Text()
+		rawJsonCh <- b.Text()
 		count++
-		//logger.Println(j)
 		if count%10000 == 0 {
-			//logger.Println(j)
-			logger.Println(count)
+			logger.Printf("Parsed %d gallaries.\n", count)
 		}
 	}
-	close(feedCh)
-	f.Close()
-	//logger.Println(j.GId)
-	logger.Println(count)
-
-	logger.Printf("End Parsing json.\n")
-	logger.Printf("Start Loading gallaries.\n")
+	close(rawJsonCh)
 	feedBarrier.Wait()
-	close(jsonCh)
+	logger.Printf("Parsed %d gallaries.\n", count)
+	logger.Printf("End Parsing json.\n")
+	close(jGalleriesCh)
 	tagBarrier.Wait()
-
 	for _, tagVs := range tags {
 		for value := range tagVs {
 			sort.Ints(tagVs[value])
