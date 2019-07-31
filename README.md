@@ -1,6 +1,6 @@
 # local-ehentai
 
-Local E-Hentai Gallery Searcher (with ~830k galleries' metadada)
+Local E-Hentai Gallery Index (with ~830k galleries' metadata)
 
 [中文简介](README-zh.md)
 
