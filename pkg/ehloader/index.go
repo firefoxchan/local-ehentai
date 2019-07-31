@@ -1,9 +1,9 @@
 package ehloader
 
 import (
+	"bufio"
 	"encoding/json"
 	"os"
-	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -12,34 +12,62 @@ import (
 var tags map[TagK]map[TagV][]int
 var galleries map[int]*Gallery
 var indexMu sync.RWMutex
+var threadNum = 8
 
-func IndexJson(path string) error {
-	indexMu.Lock()
-	defer indexMu.Unlock()
-	logger.Printf("Start Parsing json.\n")
-	jGalleries := make(map[int64]JGallery, 850000)
-	{
-		f, e := os.OpenFile(path, os.O_RDONLY, 0)
-		if e != nil {
-			return e
-		}
-		dec := json.NewDecoder(f)
-		if e := dec.Decode(&jGalleries); e != nil {
-			_ = f.Close()
-			return e
-		}
-		_ = f.Close()
+
+func ScanJson(data []byte, atEOF bool) (advance int, token []byte, err error) {
+	if atEOF && len(data) == 0 {
+		return 0, nil, nil
 	}
-	logger.Printf("End Parsing json.\n")
-	galleries = make(map[int]*Gallery, 850000)
-	tags = map[TagK]map[TagV][]int{}
-	logger.Printf("Start Loading gallaries.\n")
-	counter := 0
-	for i, j := range jGalleries {
-		if counter % 5000 == 0 {
-			logger.Printf("Loading %d gallaries...\n", counter)
+
+	inColumn:=false
+	level,start,end:=0,0,0
+	for l,s := range data{
+		if s == '"'{
+			inColumn = !inColumn
 		}
-		counter++
+		if s == '{' &&!inColumn{
+			if start == 0{
+				start = l
+			}
+			level++
+		}
+		if s == '}' &&!inColumn{
+			level--
+			if level <= 0{
+				end = l
+				break
+			}
+		}
+	}
+	if end > start{
+		return end+1, data[start:end+1], nil
+		// We have a full newline-terminated line.
+	}//logger.Println(start,end,level,len(data))
+
+	// If we're at EOF, we have a final, non-terminated line. Return it.
+	if atEOF {
+		return len(data), nil, nil
+	}
+	// Request more data.
+	return 0, nil, nil
+}
+
+func feedJson(feedCh chan string,jsonCh chan JGallery,barrier *sync.WaitGroup){
+	j := JGallery{}
+	for b := range feedCh{
+		e := json.Unmarshal([]byte(b),&j)
+		if e != nil{
+			logger.Println(e)
+			continue
+		}
+		jsonCh <- j
+	}
+	barrier.Done()
+}
+
+func tagJson(jsonCh chan JGallery,barrier *sync.WaitGroup){
+	for j := range jsonCh{
 		gallery := &Gallery{
 			GId:          j.GId,
 			Token:        strings.TrimSpace(j.Token),
@@ -99,14 +127,67 @@ func IndexJson(path string) error {
 		appendTagKVG(TagKCategory, gallery.Category, j.GId)
 		appendTagKVG(TagKUploader, gallery.Uploader, j.GId)
 		galleries[j.GId] = gallery
-		delete(jGalleries, i)
+		//delete(jGalleries, i)
 	}
-	for _, tagVs := range tags {
-		for value := range tagVs {
-			sort.Ints(tagVs[value])
+	barrier.Done()
+}
+
+func IndexJson(path string) error {
+	indexMu.Lock()
+	defer indexMu.Unlock()
+	logger.Printf("Start Parsing json.\n")
+	feedCh := make(chan string,2*threadNum)
+	jsonCh := make(chan JGallery,2*threadNum)
+	//jGalleries := make(map[int64]JGallery, 850000)
+	feedBarrier := sync.WaitGroup{}
+	feedBarrier.Add(threadNum)
+	tagBarrier := sync.WaitGroup{}
+	tagBarrier.Add(1)
+	galleries = map[int]*Gallery{}
+	tags = map[TagK]map[TagV][]int{}
+	for i:=0;i<threadNum;i++{
+		go feedJson(feedCh,jsonCh,&feedBarrier)
+	}
+	go tagJson(jsonCh,&tagBarrier)
+
+	f, e := os.Open(path)
+	f.Seek(1,0)
+	//skip first {
+	if e != nil {
+		return e
+	}
+
+	b := bufio.NewScanner(f)
+	b.Split(ScanJson)
+
+	count := 0
+	for b.Scan(){
+		feedCh <- b.Text()
+		count++
+		//logger.Println(j)
+		if count%10000 == 0{
+			//logger.Println(j)
+			logger.Println(count)
 		}
 	}
-	logger.Printf("Loading %d gallaries...\n", counter)
+	close(feedCh)
+	f.Close()
+	//logger.Println(j.GId)
+	logger.Println(count)
+
+
+	logger.Printf("End Parsing json.\n")
+	logger.Printf("Start Loading gallaries.\n")
+	feedBarrier.Wait()
+	close(jsonCh)
+	tagBarrier.Wait()
+
+
+	//for _, tagVs := range tags {
+	//	for value := range tagVs {
+	//		sort.Ints(tagVs[value])
+	//	}
+	//}
 	logger.Printf("End Loading gallaries.\n")
 	return nil
 }
