@@ -50,4 +50,4 @@ tag留空时会搜索所有tag, value以$结尾时会精确匹配
 
 # 预览
 
-![Galleries](/assets/galleries_demo.png)
+![Galleries](/assets/galleries_demo_v0.0.4.png)
