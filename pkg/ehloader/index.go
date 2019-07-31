@@ -7,6 +7,7 @@ import (
 	"os"
 	"runtime"
 	"sort"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -117,6 +118,7 @@ func tagJson(jsonCh chan JGallery, barrier *sync.WaitGroup) {
 				gallery.TorrentCount = int(tc)
 			}
 		}
+		// tags
 		for _, pair := range j.Tags {
 			key, value := BuildKV(pair, TagKMisc)
 			appendTagKVG(key, value, j.GId)
@@ -125,8 +127,20 @@ func tagJson(jsonCh chan JGallery, barrier *sync.WaitGroup) {
 			}
 			gallery.Tags[key] = append(gallery.Tags[key], value)
 		}
+		// category / uploader
 		appendTagKVG(TagKCategory, gallery.Category, j.GId)
 		appendTagKVG(TagKUploader, gallery.Uploader, j.GId)
+		// expunged
+		switch gallery.Expunged {
+		case true:
+			appendTagKVG(TagKExpunged, TagVExpungedTrue, j.GId)
+		case false:
+			appendTagKVG(TagKExpunged, TagVExpungedFalse, j.GId)
+		}
+		// min rating
+		for i:=int64(0); i<=int64(math.Round(float64(gallery.Rating))); i++ {
+			appendTagKVG(TagKMinRating, strconv.FormatInt(i, 10), j.GId)
+		}
 		galleries[j.GId] = gallery
 	}
 	barrier.Done()

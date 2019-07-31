@@ -71,6 +71,7 @@ func galleries(replaceThumbs bool, thumbs string) func(writer http.ResponseWrite
 			"GenPageLeftJumper":  genPageLeftJumper,
 			"GenPageRightJumper": genPageRightJumper,
 			"MaxPage":            maxPage,
+			"Values":             pq.Values,
 			"FSearch":            pq.FSearch,
 			"FCats":              pq.FCats,
 			"FCatsM":             pq.FCatsM,
@@ -170,6 +171,7 @@ type parsedQuery struct {
 	Offset  int
 	Limit   int
 	Q       ehloader.Q
+	Values  url.Values
 	FSearch string
 	FCats   int64
 	FCatsM  map[int64]bool
@@ -220,10 +222,23 @@ func parseQuery(values url.Values) parsedQuery {
 			}
 		}
 	}
+	advSearch := strings.TrimSpace(values.Get("advsearch"))
+	if advSearch == "1" {
+		fExpunged := strings.TrimSpace(values.Get("f_sh"))
+		if fExpunged == "" {
+			qs = append(qs, ehloader.Eq(ehloader.TagKExpunged, ehloader.TagVExpungedFalse))
+		}
+		fMinRating := strings.TrimSpace(values.Get("f_sr"))
+		if fMinRating != "" {
+			fMinRatingV := strings.TrimSpace(values.Get("f_srdd"))
+			qs = append(qs, ehloader.Eq(ehloader.TagKMinRating, fMinRatingV))
+		}
+	}
 	return parsedQuery{
 		Page:    int(page),
 		Offset:  int(offset),
 		Limit:   limit,
+		Values:  values,
 		Q:       ehloader.And(qs...),
 		FSearch: fSearch,
 		FCats:   fCats,

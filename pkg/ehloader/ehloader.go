@@ -46,10 +46,17 @@ type TagK = string
 type TagV = string
 
 const (
-	TagKAll      = "*"
-	TagKCategory = "category"
-	TagKUploader = "uploader"
-	TagKMisc     = "misc"
+	TagKAll       TagK = "*"
+	TagKCategory  TagK = "category"
+	TagKUploader  TagK = "uploader"
+	TagKMisc      TagK = "misc"
+	TagKExpunged  TagK = "expunged"
+	TagKMinRating TagK = "min rating"
+)
+
+const (
+	TagVExpungedFalse TagV = "0"
+	TagVExpungedTrue  TagV = "1"
 )
 
 var logger = log.New(os.Stderr, "[ehloader]", log.Lshortfile|log.LstdFlags)

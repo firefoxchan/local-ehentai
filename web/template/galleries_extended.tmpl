@@ -73,7 +73,64 @@
                     <input type="submit" value="Apply Filter" onclick="search_presubmit()">
                     <input type="button" value="Clear Filter" onclick="top.location.href='/'; return false">
                 </p>
-                <div id="advdiv" style="display: none;"></div>
+                <div id="advdiv">
+                    <input type="hidden" id="advsearch" name="advsearch" value="1" />
+                    <table class="itss">
+                        <!--
+                        <tr>
+                            <td class="ic4">
+                                <input id="adv11" type="checkbox" name="f_sname" checked="checked" />
+                                <label for="adv11">Search Gallery Name</label>
+                            </td>
+                            <td class="ic4">
+                                <input id="adv12" type="checkbox" name="f_stags" checked="checked" />
+                                <label for="adv12">Search Gallery Tags</label>
+                            </td>
+                            <td class="ic2"><input id="adv13" type="checkbox" name="f_sdesc" colspan="2" />
+                                <label for="adv13">Search Gallery Description</label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="ic2" colspan="2"><input id="adv15" type="checkbox" name="f_storr" /> <label for="adv15">Search Torrent Filenames</label></td>
+                            <td class="ic2" colspan="2"><input id="adv16" type="checkbox" name="f_sto" /> <label for="adv16">Only Show Galleries With Torrents</label></td>
+                        </tr>
+                        <tr>
+                            <td class="ic2" colspan="2"><input id="adv21" type="checkbox" name="f_sdt1" /> <label for="adv21">Search Low-Power Tags</label></td>
+                            <td class="ic2" colspan="2"><input id="adv22" type="checkbox" name="f_sdt2" /> <label for="adv22">Search Downvoted Tags</label></td>
+                        </tr>
+                        -->
+                        <tr>
+                            <td class="ic2" colspan="2">
+                                <input id="adv31" type="checkbox" name="f_sh" {{if (.Values.Get "f_sh" ) }}checked{{end}}/>
+                                <label for="adv31">Show Expunged Galleries</label></td>
+                            <td class="ic2" colspan="2">
+                                <input id="adv32" type="checkbox" name="f_sr" {{if (.Values.Get "f_sr" ) }}checked{{end}}/>
+                                <label for="adv32">Minimum Rating:</label>
+                                <select id="adv42" class="imr" name="f_srdd">
+                                    <option value="2" {{if (eq (.Values.Get "f_srdd") "2")}}selected{{end}}>2 stars</option>
+                                    <option value="3" {{if (eq (.Values.Get "f_srdd") "3")}}selected{{end}}>3 stars</option>
+                                    <option value="4" {{if (eq (.Values.Get "f_srdd") "4")}}selected{{end}}>4 stars</option>
+                                    <option value="5" {{if (eq (.Values.Get "f_srdd") "5")}}selected{{end}}>5 stars</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <!--
+                        <tr>
+                            <td class="ic2" colspan="2"><input id="adv61" type="checkbox" name="f_sp" />
+                                <label for="adv61">Between </label>
+                                <input type="text" name="f_spf" value="" size="4" maxlength="4" style="width:30px" /> and <input type="text" name="f_spt" value="" size="4" maxlength="4" style="width:30px" /> pages
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="ic1" colspan="4">Disable default filters for:
+                                <input id="adv51" type="checkbox" name="f_sfl" /> <label for="adv51">Language</label>
+                                <input id="adv52" type="checkbox" name="f_sfu" /> <label for="adv52">Uploader</label>
+                                <input id="adv53" type="checkbox" name="f_sft" /> <label for="adv53">Tags</label>
+                            </td>
+                        </tr>
+                        -->
+                    </table>
+                </div>
             </form>
         </div>
         <div id="fsdiv" class="idi" style="margin-top:10px; display:none"></div>
