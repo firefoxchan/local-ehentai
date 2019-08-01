@@ -12,7 +12,7 @@ func IndexJsonNative(path string) error {
 	indexMu.Lock()
 	defer indexMu.Unlock()
 	logger.Printf("Start Parsing json.\n")
-	jGalleries := make(map[int64]JGallery, 850000)
+	jGalleries := make(map[int]JGallery, 850000)
 	{
 		f, e := os.OpenFile(path, os.O_RDONLY, 0)
 		if e != nil {
@@ -27,7 +27,6 @@ func IndexJsonNative(path string) error {
 	}
 	logger.Printf("End Parsing json.\n")
 	galleries = make(map[int]*Gallery, 850000)
-	tags = map[TagK]map[TagV][]int{}
 	logger.Printf("Start Loading gallaries.\n")
 	counter := 0
 	for i, j := range jGalleries {

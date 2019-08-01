@@ -47,7 +47,7 @@ func main() {
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
-	if e := ehloader.IndexJsonNative(jsonPath); e != nil {
+	if e := ehloader.IndexJsonFast(jsonPath); e != nil {
 		panic(e)
 	}
 	switch mode {
