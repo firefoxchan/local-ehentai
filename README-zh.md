@@ -62,4 +62,6 @@ TODO
 
 # 预览
 
+![Galleries](/assets/galleries_demo_v0.0.5_1.png)
+
 ![Galleries](/assets/galleries_demo_v0.0.5.png)

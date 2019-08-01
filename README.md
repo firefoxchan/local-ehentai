@@ -64,4 +64,6 @@ If you have downloaded thumbnails form [this torrent](https://sukebei.nyaa.si/vi
 
 # Demo
 
+![Galleries](/assets/galleries_demo_v0.0.5_1.png)
+
 ![Galleries](/assets/galleries_demo_v0.0.5.png)
