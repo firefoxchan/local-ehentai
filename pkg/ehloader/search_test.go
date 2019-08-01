@@ -31,6 +31,8 @@ func TestRSlice(t *testing.T) {
 	checkMatch(t, []int{2, 3, 4}, rSlice(match, 2, 3))
 	checkMatch(t, []int{8, 9, 10}, rSlice(match, 8, 3))
 	checkMatch(t, []int{9, 10}, rSlice(match, 9, 3))
+	checkMatch(t, []int{9, 10}, rSlice(match, 9, -1))
+	checkMatch(t, []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, rSlice(match, 0, -1))
 }
 
 func checkMatch(t *testing.T, target, ret []int) {

@@ -30,6 +30,7 @@ func handleJGallery(j JGallery) {
 	gallery := &Gallery{
 		GId:          j.GId,
 		Token:        strings.TrimSpace(j.Token),
+		ArchiverKey:  j.ArchiverKey,
 		Title:        strings.TrimSpace(j.Title),
 		TitleJpn:     strings.TrimSpace(j.TitleJpn),
 		Category:     strings.TrimSpace(j.Category),
@@ -44,7 +45,7 @@ func handleJGallery(j JGallery) {
 		Tags:         map[TagK][]TagV{},
 	}
 	{
-		posted, e := j.Posted.Int64()
+		posted, e := strconv.ParseInt(j.Posted, 10, 64)
 		if e != nil {
 			logger.Printf("Load gallary %d .posted error: %s\n", j.GId, e)
 		} else {
@@ -52,7 +53,7 @@ func handleJGallery(j JGallery) {
 		}
 	}
 	{
-		fc, e := j.FileCount.Int64()
+		fc, e := strconv.ParseInt(j.FileCount, 10, 64)
 		if e != nil {
 			logger.Printf("Load gallary %d .filecount error: %s\n", j.GId, e)
 		} else {
@@ -60,7 +61,7 @@ func handleJGallery(j JGallery) {
 		}
 	}
 	{
-		rt, e := j.Rating.Float64()
+		rt, e := strconv.ParseFloat(j.Rating, 64)
 		if e != nil {
 			logger.Printf("Load gallary %d .rating error: %s\n", j.GId, e)
 		} else {
@@ -68,7 +69,7 @@ func handleJGallery(j JGallery) {
 		}
 	}
 	{
-		tc, e := j.TorrentCount.Int64()
+		tc, e := strconv.ParseInt(j.TorrentCount, 10, 64)
 		if e != nil {
 			logger.Printf("Load gallary %d .torrent_count error: %s\n", j.GId, e)
 		} else {

@@ -44,8 +44,14 @@ func Search(searchTags map[TagK]map[TagV]struct{}, offset, limit int) []*Gallery
 }
 
 func rSlice(match []int, offset int, limit int) []int {
-	from := len(match) - offset - limit
-	to := from + limit
+	var from, to int
+	if limit > 0 {
+		from = len(match) - offset - limit
+		to = from + limit
+	} else {
+		from = 0
+		to = len(match) - offset
+	}
 	if to > len(match) {
 		to = len(match)
 	}

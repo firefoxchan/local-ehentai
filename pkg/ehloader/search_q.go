@@ -19,10 +19,11 @@ func SearchQ(offset, limit int, q Q) ([]*Gallery, int) {
 		logger.Printf("SearchQ: %d, %d, %s", offset, limit, cacheKey)
 		searchQCache.Set(cacheKey, match, 10*time.Minute)
 	}
-	gs := make([]*Gallery, 0, limit)
-	for _, id := range rSlice(match, offset, limit) {
+	sliced := rSlice(match, offset, limit)
+	gs := make([]*Gallery, len(sliced))
+	for i, id := range sliced {
 		if g, ok := galleries[id]; ok {
-			gs = append(gs, g)
+			gs[i] = g
 		}
 	}
 	return gs, len(match)

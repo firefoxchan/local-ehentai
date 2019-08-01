@@ -30,6 +30,14 @@ func galleries(replaceThumbs bool, thumbs string) func(writer http.ResponseWrite
 		}
 		logger.Printf("Galleries query: %v\n", values)
 		pq := parseQuery(values)
+		switch pq.Export {
+		case exportModeCSV:
+			exportCSV(pq, writer, request)
+			return
+		case exportModeJSON:
+			exportJSON(pq, writer, request)
+			return
+		}
 		gs, total := ehloader.SearchQ(pq.Offset, pq.Limit, pq.Q)
 		maxPage := total / pq.Limit
 		if total%pq.Limit != 0 {
@@ -174,6 +182,7 @@ type parsedQuery struct {
 	Page    int
 	Offset  int
 	Limit   int
+	Export  int
 	Q       ehloader.Q
 	Values  url.Values
 	FSearch string
@@ -181,12 +190,19 @@ type parsedQuery struct {
 	FCatsM  map[int64]bool
 }
 
+const (
+	exportModeNone = iota
+	exportModeCSV
+	exportModeJSON
+)
+
 func parseQuery(values url.Values) parsedQuery {
 	const limit = 10
 	page, _ := strconv.ParseInt(values.Get("page"), 10, 64)
 	values.Del("page")
 	offset := page * limit
 	qs := make([]ehloader.Q, 0)
+	// category
 	fCats, _ := strconv.ParseInt(values.Get("f_cats"), 10, 64)
 	fCatsM := map[int64]bool{}
 	{
@@ -212,6 +228,7 @@ func parseQuery(values url.Values) parsedQuery {
 			qs = append(qs, ehloader.Or(categoryQs...))
 		}
 	}
+	// search
 	fSearch := strings.TrimSpace(values.Get("f_search"))
 	{
 		kvs := strings.Split(fSearch, ",")
@@ -243,10 +260,20 @@ func parseQuery(values url.Values) parsedQuery {
 			qs = append(qs, ehloader.Eq(ehloader.TagKExists, fLocalFiles))
 		}
 	}
+	// export
+	export := strings.ToLower(strings.TrimSpace(values.Get("export")))
+	exportMode := exportModeNone
+	switch export {
+	case "csv":
+		exportMode = exportModeCSV
+	case "json":
+		exportMode = exportModeJSON
+	}
 	return parsedQuery{
 		Page:    int(page),
 		Offset:  int(offset),
 		Limit:   limit,
+		Export:  exportMode,
 		Values:  values,
 		Q:       ehloader.And(qs...),
 		FSearch: fSearch,
