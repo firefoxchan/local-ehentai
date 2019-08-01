@@ -18,6 +18,7 @@ import (
 func main() {
 	var (
 		jsonPath   string
+		urlPath    string
 		thumbsPath string
 		format     string
 		host       string
@@ -25,29 +26,21 @@ func main() {
 		mode       string
 	)
 	flag.StringVar(&jsonPath, "j", "", "path to eh api json file")
+	flag.StringVar(&urlPath, "u", "", "path to exists url list file")
 	flag.StringVar(&thumbsPath, "t", "", "path to thumbs dir")
 	flag.StringVar(&format, "f", "dense", "output format. dense, json")
 	flag.StringVar(&host, "h", "127.0.0.1:8080", "http listen addr")
 	flag.StringVar(&pprofHost, "p", "127.0.0.1:8081", "pprof http listen addr")
 	flag.StringVar(&mode, "m", "http", "start mode. cmd, http")
 	flag.Parse()
-	if jsonPath == "" {
-		if _, e := os.Stat("gdata.json"); e == nil {
-			jsonPath = "gdata.json"
-		}
-	}
-	if thumbsPath == "" {
-		if fi, e := os.Stat("thumbs"); e == nil {
-			if fi.IsDir() {
-				thumbsPath = "thumbs"
-			}
-		}
-	}
+	setDefaultPath(&jsonPath, "gdata.json", nil)
+	setDefaultPath(&urlPath, "existUrls.txt", nil)
+	setDefaultPath(&thumbsPath, "thumbs", func(fi os.FileInfo) bool { return fi.IsDir() })
 	if jsonPath == "" {
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
-	if e := ehloader.Index(jsonPath); e != nil {
+	if e := ehloader.Index(jsonPath, urlPath); e != nil {
 		panic(e)
 	}
 	switch mode {
@@ -58,6 +51,18 @@ func main() {
 	default:
 		flag.PrintDefaults()
 		os.Exit(1)
+	}
+}
+
+func setDefaultPath(s *string, dft string, additionalCheck func(fi os.FileInfo) bool) {
+	if *s == "" {
+		if fi, e := os.Stat(dft); e == nil {
+			if additionalCheck == nil {
+				*s = dft
+			} else if additionalCheck(fi) {
+				*s = dft
+			}
+		}
 	}
 }
 

@@ -28,8 +28,8 @@ func galleries(replaceThumbs bool, thumbs string) func(writer http.ResponseWrite
 			logger.Printf("Galleries parse query error: %s", e)
 			return
 		}
+		logger.Printf("Galleries query: %v\n", values)
 		pq := parseQuery(values)
-		logger.Printf("Galleries query: %v -> Offset: %d, Limit: %d, Query:\n%s", values, pq.Offset, pq.Limit, pq.Q.Dump("  ", "  "))
 		gs, total := ehloader.SearchQ(pq.Offset, pq.Limit, pq.Q)
 		maxPage := total / pq.Limit
 		if total%pq.Limit != 0 {
@@ -163,8 +163,11 @@ var queryCategories = map[int64]string{
 	32:  "image set",
 	64:  "cosplay",
 	128: "asian porn",
-	512: "western",
 	256: "non-h",
+	512: "western",
+}
+var queryCategoryMasks = []int64{
+	1, 2, 4, 8, 16, 32, 64, 128, 256, 512,
 }
 
 type parsedQuery struct {
@@ -188,10 +191,10 @@ func parseQuery(values url.Values) parsedQuery {
 	fCatsM := map[int64]bool{}
 	{
 		categories := make([]string, 0)
-		for mask, category := range queryCategories {
+		for _, mask := range queryCategoryMasks {
 			if fCats&mask == 0 {
 				fCatsM[mask] = true
-				categories = append(categories, category)
+				categories = append(categories, queryCategories[mask])
 			} else {
 				fCatsM[mask] = false
 			}
@@ -234,6 +237,10 @@ func parseQuery(values url.Values) parsedQuery {
 		if fMinRating != "" {
 			fMinRatingV := strings.TrimSpace(values.Get("f_srdd"))
 			qs = append(qs, ehloader.Eq(ehloader.TagKMinRating, fMinRatingV))
+		}
+		fLocalFiles := strings.TrimSpace(values.Get("f_local_files"))
+		if fLocalFiles != "" {
+			qs = append(qs, ehloader.Eq(ehloader.TagKExists, fLocalFiles))
 		}
 	}
 	return parsedQuery{

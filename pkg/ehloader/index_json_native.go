@@ -28,7 +28,7 @@ func indexJsonNative(path string) error {
 	logger.Printf("Start Loading gallaries.\n")
 	counter := 0
 	for i, j := range jGalleries {
-		if counter % 10000 == 0 {
+		if counter%10000 == 0 {
 			logger.Printf("Loading %d gallaries...\n", counter)
 		}
 		counter++

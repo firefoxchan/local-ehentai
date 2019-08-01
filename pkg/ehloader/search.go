@@ -1,7 +1,10 @@
 package ehloader
 
 import (
+	"fmt"
+	"github.com/firefoxchan/local-ehentai/pkg/cache"
 	"strings"
+	"time"
 )
 
 func Search(searchTags map[TagK]map[TagV]struct{}, offset, limit int) []*Gallery {
@@ -61,16 +64,24 @@ func rSlice(match []int, offset int, limit int) []int {
 	return sliced
 }
 
-type matchMode int
+type matchMode string
 
 const (
-	matchModeLike matchMode = 0
-	matchModeEq   matchMode = 1
+	matchModeLike matchMode = "like"
+	matchModeEq   matchMode = "exact"
 )
+
+var matchTagKVCache = cache.NewCache(time.Minute)
 
 func matchTagKV(matchK, matchV string, mode matchMode) ([]int, bool) {
 	matchK = strings.ToLower(matchK)
 	matchV = strings.ToLower(matchV)
+	cacheKey := fmt.Sprintf("%s:%s:%s", matchK, matchV, mode)
+	if cached, ok := matchTagKVCache.Get(cacheKey, 10*time.Minute); ok {
+		match := cached.([]int)
+		logger.Printf("Match (cached): %s, %s, %s, %d", mode, matchK, matchV, len(match))
+		return match, true
+	}
 	if _, ok := tags[matchK]; !ok {
 		logger.Printf("Match: %s, %s, 0", matchK, matchV)
 		return nil, false
@@ -89,7 +100,8 @@ func matchTagKV(matchK, matchV string, mode matchMode) ([]int, bool) {
 		}
 	}
 	match := union(matches)
-	logger.Printf("Match: %d, %s, %s, %d", mode, matchK, matchV, len(match))
+	logger.Printf("Match: %s, %s, %s, %d", mode, matchK, matchV, len(match))
+	matchTagKVCache.Set(cacheKey, match, 10*time.Minute)
 	return match, true
 }
 

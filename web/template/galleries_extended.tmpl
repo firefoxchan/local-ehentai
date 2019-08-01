@@ -102,7 +102,8 @@
                         <tr>
                             <td class="ic2" colspan="2">
                                 <input id="adv31" type="checkbox" name="f_sh" {{if (.Values.Get "f_sh" ) }}checked{{end}}/>
-                                <label for="adv31">Show Expunged Galleries</label></td>
+                                <label for="adv31">Show Expunged Galleries</label>
+                            </td>
                             <td class="ic2" colspan="2">
                                 <input id="adv32" type="checkbox" name="f_sr" {{if (.Values.Get "f_sr" ) }}checked{{end}}/>
                                 <label for="adv32">Minimum Rating:</label>
@@ -113,6 +114,21 @@
                                     <option value="5" {{if (eq (.Values.Get "f_srdd") "5")}}selected{{end}}>5 stars</option>
                                 </select>
                             </td>
+                        </tr>
+                        <tr>
+                            <td class="ic2" colspan="2">
+                                <label for="local-file-select" class="no-check-box">Local files filter:</label>
+                                <select id="local-file-select" class="imr" name="f_local_files">
+                                    <option value="" {{if (eq (.Values.Get "f_local_files") "")}}selected{{end}}>All</option>
+                                    <option value="1" {{if (eq (.Values.Get "f_local_files") "1")}}selected{{end}}>Exist files</option>
+                                    <option value="0" {{if (eq (.Values.Get "f_local_files") "2")}}selected{{end}}>Not exist files</option>
+                                </select>
+                            </td>
+                            <!--
+                            <td class="ic2" colspan="2">
+                                <input type="submit" name="export" value="Export CSV">
+                            </td>
+                            -->
                         </tr>
                         <!--
                         <tr>

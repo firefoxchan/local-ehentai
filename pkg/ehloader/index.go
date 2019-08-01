@@ -10,15 +10,23 @@ import (
 
 var tags map[TagK]map[TagV][]int
 var galleries map[int]*Gallery
+var gExistsInUrls map[int]struct{}
 var indexMu sync.RWMutex
 
-func Index(jsonPath string) error {
+func Index(jsonPath string, urlPath string) error {
 	indexMu.Lock()
 	defer indexMu.Unlock()
+	if urlPath != "" {
+		matchedGs, e := indexURLList(urlPath)
+		if e != nil {
+			return e
+		}
+		gExistsInUrls = matchedGs
+	}
 	return indexJsonFast(jsonPath)
 }
 
-func handleJGallery(j JGallery) () {
+func handleJGallery(j JGallery) {
 	gallery := &Gallery{
 		GId:          j.GId,
 		Token:        strings.TrimSpace(j.Token),
@@ -87,10 +95,26 @@ func handleJGallery(j JGallery) () {
 		appendTagKVG(TagKExpunged, TagVExpungedFalse, j.GId)
 	}
 	// min rating
-	for i:=int64(0); i<=int64(math.Round(float64(gallery.Rating))); i++ {
+	for i := int64(0); i <= int64(math.Round(float64(gallery.Rating))); i++ {
 		appendTagKVG(TagKMinRating, strconv.FormatInt(i, 10), j.GId)
 	}
+	// exists
+	switch {
+	case existsIn(j.GId, gExistsInUrls):
+		gallery.Exists = true
+		appendTagKVG(TagKExists, TagVExistsTrue, j.GId)
+		gallery.ExistsIn = TagVExistsInURL
+		appendTagKVG(TagKExistsIn, TagVExistsInURL, j.GId)
+	default:
+		gallery.Exists = false
+		appendTagKVG(TagKExists, TagVExistsFalse, j.GId)
+	}
 	galleries[j.GId] = gallery
+}
+
+func existsIn(gid int, set map[int]struct{}) bool {
+	_, ok := set[gid]
+	return ok
 }
 
 func BuildKV(pair string, defaultTagK string) (string, string) {

@@ -12,7 +12,7 @@ type Q struct {
 	subQs []Q
 }
 
-func (q Q) Dump(prefix string, indent string) string {
+func (q Q) Dump(prefix string, indent string, sep string) string {
 	switch q.op {
 	case QOpAnd, QOpOr:
 		lines := make([]string, len(q.subQs)+3)
@@ -20,9 +20,9 @@ func (q Q) Dump(prefix string, indent string) string {
 		lines[1] = fmt.Sprintf("%s%s", prefix+indent, strings.ToUpper(q.op))
 		lines[len(q.subQs)+2] = fmt.Sprintf("%s]", prefix)
 		for i, subQ := range q.subQs {
-			lines[i+2] = subQ.Dump(prefix+indent, indent)
+			lines[i+2] = subQ.Dump(prefix+indent, indent, sep)
 		}
-		return strings.Join(lines, "\n")
+		return strings.Join(lines, sep)
 	case QOpLike, QOpEq:
 		return fmt.Sprintf("%s[%s %s %s]", prefix, q.op, q.k, q.v)
 	}

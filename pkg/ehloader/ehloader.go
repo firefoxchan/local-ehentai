@@ -40,6 +40,8 @@ type Gallery struct {
 	Rating       float32
 	TorrentCount int
 	Tags         map[string][]string
+	Exists       bool
+	ExistsIn     string
 }
 
 type TagK = string
@@ -52,11 +54,16 @@ const (
 	TagKMisc      TagK = "misc"
 	TagKExpunged  TagK = "expunged"
 	TagKMinRating TagK = "min rating"
+	TagKExists    TagK = "exists"
+	TagKExistsIn  TagK = "exists in"
 )
 
 const (
 	TagVExpungedFalse TagV = "0"
 	TagVExpungedTrue  TagV = "1"
+	TagVExistsFalse   TagV = "0"
+	TagVExistsTrue    TagV = "1"
+	TagVExistsInURL   TagV = "url"
 )
 
 var logger = log.New(os.Stderr, "[ehloader]", log.Lshortfile|log.LstdFlags)
