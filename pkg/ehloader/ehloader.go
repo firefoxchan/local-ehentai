@@ -18,7 +18,7 @@ type JGallery struct {
 	Uploader     string      `json:"uploader"`
 	Posted       json.Number `json:"posted"`
 	FileCount    json.Number `json:"filecount"`
-	FileSize     int         `json:"filesize"`
+	FileSize     int64       `json:"filesize"`
 	Expunged     bool        `json:"expunged"`
 	Rating       json.Number `json:"rating"`
 	TorrentCount json.Number `json:"torrentcount"`
@@ -35,7 +35,7 @@ type Gallery struct {
 	Uploader     string
 	Posted       time.Time
 	FileCount    int
-	FileSize     int
+	FileSize     int64
 	Expunged     bool
 	Rating       float32
 	TorrentCount int
