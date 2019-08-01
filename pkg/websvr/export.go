@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/firefoxchan/local-ehentai/pkg/ehloader"
 	"net/http"
+	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -55,6 +56,10 @@ func exportCSV(pq parsedQuery, writer http.ResponseWriter, request *http.Request
 		}
 		if counter%10000 == 0 {
 			logger.Printf("Exported %d gallaries.\n", counter)
+			if runtime.GOARCH == "386" {
+				logger.Printf("Force GC.\n")
+				runtime.GC()
+			}
 		}
 		counter++
 		if counter%100 == 0 {
@@ -71,6 +76,8 @@ func exportCSV(pq parsedQuery, writer http.ResponseWriter, request *http.Request
 		return
 	}
 	logger.Printf("Exported %d gallaries.\n", counter)
+	logger.Printf("Force GC.\n")
+	runtime.GC()
 }
 
 func exportJSON(pq parsedQuery, writer http.ResponseWriter, request *http.Request) {
@@ -122,6 +129,10 @@ func exportJSON(pq parsedQuery, writer http.ResponseWriter, request *http.Reques
 		}
 		if counter%10000 == 0 {
 			logger.Printf("Exported %d gallaries.\n", counter)
+			if runtime.GOARCH == "386" {
+				logger.Printf("Force GC.\n")
+				runtime.GC()
+			}
 		}
 		counter++
 	}
@@ -130,4 +141,6 @@ func exportJSON(pq parsedQuery, writer http.ResponseWriter, request *http.Reques
 		return
 	}
 	logger.Printf("Exported %d gallaries.\n", counter)
+	logger.Printf("Force GC.\n")
+	runtime.GC()
 }

@@ -83,6 +83,8 @@ func indexJsonFast(path string) error {
 	}
 	logger.Printf("Tag stats (> %d):\n%s", tagDumpMinLength, strings.Join(tagDumps, "\n"))
 	logger.Printf("End Loading gallaries.\n")
+	logger.Printf("Force GC.\n")
+	runtime.GC()
 	return nil
 }
 

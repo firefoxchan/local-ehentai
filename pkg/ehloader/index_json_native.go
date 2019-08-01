@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"runtime"
 	"sort"
 	"strings"
 )
@@ -61,5 +62,7 @@ func indexJsonNative(path string) error {
 	}
 	logger.Printf("Tag stats (> %d):\n%s", tagDumpMinLength, strings.Join(tagDumps, "\n"))
 	logger.Printf("End Loading gallaries.\n")
+	logger.Printf("Force GC.\n")
+	runtime.GC()
 	return nil
 }

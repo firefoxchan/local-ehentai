@@ -31,6 +31,9 @@ func indexURLList(urlPath string) (map[int]struct{}, error) {
 		if line == "" {
 			continue
 		}
+		if strings.HasPrefix(line, "#") {
+			continue
+		}
 		u, e := url.Parse(line)
 		if e != nil {
 			logger.Printf("Unable to parse url: %s, %s", e, line)
