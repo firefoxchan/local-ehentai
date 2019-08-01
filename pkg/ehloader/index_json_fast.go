@@ -12,11 +12,7 @@ import (
 	"sync"
 )
 
-// Buggy
-func IndexJsonFast(path string) error {
-	indexMu.Lock()
-	defer indexMu.Unlock()
-
+func indexJsonFast(path string) error {
 	var feederNum = int(math.Max(float64(runtime.NumCPU()-2), 1))
 	rawJsonCh := make(chan string, 2*feederNum)
 	jGalleriesCh := make(chan JGallery, 2*feederNum)

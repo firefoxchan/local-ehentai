@@ -12,6 +12,12 @@ var tags map[TagK]map[TagV][]int
 var galleries map[int]*Gallery
 var indexMu sync.RWMutex
 
+func Index(jsonPath string) error {
+	indexMu.Lock()
+	defer indexMu.Unlock()
+	return indexJsonFast(jsonPath)
+}
+
 func handleJGallery(j JGallery) () {
 	gallery := &Gallery{
 		GId:          j.GId,

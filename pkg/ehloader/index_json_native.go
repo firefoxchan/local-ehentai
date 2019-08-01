@@ -8,9 +8,7 @@ import (
 	"strings"
 )
 
-func IndexJsonNative(path string) error {
-	indexMu.Lock()
-	defer indexMu.Unlock()
+func indexJsonNative(path string) error {
 	logger.Printf("Start Parsing json.\n")
 	jGalleries := make(map[int]JGallery, 850000)
 	{
