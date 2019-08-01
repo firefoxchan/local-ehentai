@@ -117,7 +117,7 @@
                         </tr>
                         <tr>
                             <td class="ic2" colspan="2">
-                                <label for="local-file-select" class="no-check-box">Local files filter:</label>
+                                <label class="no-check-box">Local Files Filter:</label>
                                 <select id="local-file-select" class="imr" name="f_local_files">
                                     <option value="" {{if (eq (.Values.Get "f_local_files") "")}}selected{{end}}>All</option>
                                     <option value="1" {{if (eq (.Values.Get "f_local_files") "1")}}selected{{end}}>Exist files</option>
