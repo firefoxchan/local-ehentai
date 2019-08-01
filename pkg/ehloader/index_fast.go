@@ -133,8 +133,8 @@ func scanJson(data []byte, atEOF bool) (advance int, token []byte, err error) {
 }
 
 func feedJson(feedCh chan string, jsonCh chan JGallery, barrier *sync.WaitGroup) {
-	j := JGallery{}
 	for b := range feedCh {
+		j := JGallery{}
 		e := json.Unmarshal([]byte(b), &j)
 		if e != nil {
 			logger.Printf("Json unmarshal error: %s", e)
