@@ -44,6 +44,17 @@ If the value ends with $, an exact match will be performed.
 Will match  
 (`artist` is `toyo`) AND (`female` contains `swim`)
 
+## Local Files Filter
+
+### URL Based
+
+1. Modify file `existUrls.txt` in the same directory with local-ehentai.exe
+2. Restart local-ehentai.exe
+
+### Filename Based
+
+TODO
+
 ## Enable Local Thumbnails Cache
 
 If you have downloaded thumbnails form [this torrent](https://sukebei.nyaa.si/view/2770267), you can use local thumbs cache without connecting to eght.org
@@ -53,4 +64,4 @@ If you have downloaded thumbnails form [this torrent](https://sukebei.nyaa.si/vi
 
 # Demo
 
-![Galleries](/assets/galleries_demo_v0.0.4.png)
+![Galleries](/assets/galleries_demo_v0.0.5.png)

@@ -41,6 +41,18 @@ tag留空时会搜索所有tag, value以$结尾时会精确匹配
 会匹配  
 `artist`是`toyo` 并且 `female`中包含`swim`的数据
 
+## 本地文件筛选器
+
+### 基于URL
+
+1. 编辑与 local-ehentai.exe 同一文件夹下的 `existUrls.txt`
+2. 重启 local-ehentai.exe
+
+### 基于文件名
+
+TODO
+
+
 ## 启用本地缩略图缓存
 
 如果你从 [这里](https://sukebei.nyaa.si/view/2770267) 下载了缩略图包, 可以直接开启本地缩略图缓存, 不用访问eght.org
@@ -50,4 +62,4 @@ tag留空时会搜索所有tag, value以$结尾时会精确匹配
 
 # 预览
 
-![Galleries](/assets/galleries_demo_v0.0.4.png)
+![Galleries](/assets/galleries_demo_v0.0.5.png)
