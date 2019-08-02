@@ -4,6 +4,15 @@ Local E-Hentai Gallery Index (with ~830k galleries' metadata)
 
 [中文简介](README-zh.md)
 
+# Features
+
+- Search multiple tags, in like mode / exact mode
+- Local thumbnails cache
+- Export search results as csv / json
+- Expunged / min-rating filter
+- (URL based) local files filter
+- [TODO] (Filename based) local files filter
+
 # Build
 
 ## Requirement
