@@ -4,6 +4,22 @@ Local E-Hentai Gallery Index (with ~830k galleries' metadata)
 
 [中文简介](README-zh.md)
 
+# Build
+
+## Requirement
+
+- Go >= 1.12
+
+## Build
+
+Build package `cmd/local-ehentai`:
+
+```bash
+go build ./cmd/local-ehentai
+```
+
+Set your workdir to `web` when running
+
 # Usage
 
 ## Quick Start

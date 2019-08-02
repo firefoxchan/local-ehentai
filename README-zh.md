@@ -2,6 +2,22 @@
 
 Local E-Hentai Gallery Searcher
 
+# 编译
+
+## 依赖
+
+- Go >= 1.12
+
+## 编译
+
+编译包 `cmd/local-ehentai`:
+
+```bash
+go build ./cmd/local-ehentai
+```
+
+运行时将workdir设置为`web`
+
 # 使用方法
 
 ## 启动服务
