@@ -65,7 +65,7 @@ func searchQMatch(k TagK, v TagV, mode matchMode) []int {
 		matches := make([][]int, 0)
 		for k := range tags {
 			switch strings.ToLower(k) {
-			case TagKExpunged, TagKMinRating, TagKExists, TagKExistsIn:
+			case TagKExpunged, TagKMinRating, TagKExists, TagKExistsIn, TagKGId:
 				// special tags
 				continue
 			default:

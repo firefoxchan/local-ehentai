@@ -3,6 +3,7 @@ package ehloader
 import (
 	"fmt"
 	"github.com/firefoxchan/local-ehentai/pkg/cache"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -82,6 +83,16 @@ var matchTagKVCache = cache.NewCache(time.Minute)
 func matchTagKV(matchK, matchV string, mode matchMode) ([]int, bool) {
 	matchK = strings.ToLower(matchK)
 	matchV = strings.ToLower(matchV)
+	// special case
+	if matchK == TagKGId {
+		matchVInt, e := strconv.ParseInt(matchV, 10, 64)
+		if e == nil {
+			if g, ok := galleries[int(matchVInt)]; ok {
+				return []int{g.GId}, true
+			}
+		}
+		return []int{}, true
+	}
 	cacheKey := fmt.Sprintf("%s:%s:%s", matchK, matchV, mode)
 	if cached, ok := matchTagKVCache.Get(cacheKey, 10*time.Minute); ok {
 		match := cached.([]int)

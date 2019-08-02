@@ -53,6 +53,7 @@ If the value ends with $, an exact match will be performed.
 - `male`
 - `language`
 - `misc`
+- `gid` (exact match)
 
 ### Example
 

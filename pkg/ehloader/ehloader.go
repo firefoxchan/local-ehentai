@@ -56,6 +56,7 @@ const (
 	TagKMinRating TagK = "min rating"
 	TagKExists    TagK = "exists"
 	TagKExistsIn  TagK = "exists in"
+	TagKGId       TagK = "gid"
 )
 
 const (

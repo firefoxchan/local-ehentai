@@ -50,6 +50,7 @@ tag留空时会搜索所有tag, value以$结尾时会精确匹配
 - `male`
 - `language`
 - `misc`
+- `gid` (精确匹配)
 
 ### 样例 
 
