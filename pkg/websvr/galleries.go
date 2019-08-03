@@ -183,6 +183,7 @@ type parsedQuery struct {
 	Offset  int
 	Limit   int
 	Export  int
+	OrderBy int
 	Q       ehloader.Q
 	Values  url.Values
 	FSearch string
@@ -194,6 +195,12 @@ const (
 	exportModeNone = iota
 	exportModeCSV
 	exportModeJSON
+)
+
+const (
+	orderByGId = iota
+	orderByPosted
+	orderByRating
 )
 
 func parseQuery(values url.Values) parsedQuery {
@@ -260,6 +267,15 @@ func parseQuery(values url.Values) parsedQuery {
 			qs = append(qs, ehloader.Eq(ehloader.TagKExists, fLocalFiles))
 		}
 	}
+	// order
+	fOrder := strings.ToLower(strings.TrimSpace(values.Get("f_order")))
+	orderBy := orderByGId
+	switch fOrder {
+	case "posted":
+		orderBy = orderByPosted
+	case "rating":
+		orderBy = orderByRating
+	}
 	// export
 	export := strings.ToLower(strings.TrimSpace(values.Get("export")))
 	exportMode := exportModeNone
@@ -274,6 +290,7 @@ func parseQuery(values url.Values) parsedQuery {
 		Offset:  int(offset),
 		Limit:   limit,
 		Export:  exportMode,
+		OrderBy: orderBy,
 		Values:  values,
 		Q:       ehloader.And(qs...),
 		FSearch: fSearch,

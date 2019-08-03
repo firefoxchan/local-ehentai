@@ -17,21 +17,28 @@ import (
 
 func main() {
 	var (
-		jsonPath   string
-		urlPath    string
-		thumbsPath string
-		format     string
-		host       string
-		pprofHost  string
-		mode       string
+		jsonPath        string
+		urlPath         string
+		thumbsPath      string
+		format          string
+		host            string
+		pprofHost       string
+		mode            string
 	)
 	flag.StringVar(&jsonPath, "j", "", "path to eh api json file")
+	flag.StringVar(&jsonPath, "json", "", "path to eh api json file")
 	flag.StringVar(&urlPath, "u", "", "path to exists url list file")
+	flag.StringVar(&urlPath, "existUrls", "", "path to exists url list file")
 	flag.StringVar(&thumbsPath, "t", "", "path to thumbs dir")
+	flag.StringVar(&thumbsPath, "thumbs", "", "path to thumbs dir")
 	flag.StringVar(&format, "f", "dense", "output format. dense, json")
+	flag.StringVar(&format, "format", "dense", "output format. dense, json")
 	flag.StringVar(&host, "h", "127.0.0.1:8080", "http listen addr")
+	flag.StringVar(&host, "host", "127.0.0.1:8080", "http listen addr")
 	flag.StringVar(&pprofHost, "p", "127.0.0.1:8081", "pprof http listen addr")
+	flag.StringVar(&pprofHost, "pprofHost", "127.0.0.1:8081", "pprof http listen addr")
 	flag.StringVar(&mode, "m", "http", "start mode. cmd, http")
+	flag.StringVar(&mode, "mode", "http", "start mode. cmd, http")
 	flag.Parse()
 	setDefaultPath(&jsonPath, "gdata.json", nil)
 	setDefaultPath(&urlPath, "existUrls.txt", nil)

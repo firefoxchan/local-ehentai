@@ -117,6 +117,16 @@
                         </tr>
                         <tr>
                             <td class="ic2" colspan="2">
+                                <label class="no-check-box">Order By:</label>
+                                <select class="imr" name="f_order">
+                                    <option value="" {{if (eq (.Values.Get "f_order") "")}}selected{{end}}>GID</option>
+                                    <option value="posted" {{if (eq (.Values.Get "f_order") "posted")}}selected{{end}}>Posted Time</option>
+                                    <option value="rating" {{if (eq (.Values.Get "f_order") "rating")}}selected{{end}}>Rating</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="ic2" colspan="2">
                                 <label class="no-check-box">Local Files Filter:</label>
                                 <select id="local-file-select" class="imr" name="f_local_files">
                                     <option value="" {{if (eq (.Values.Get "f_local_files") "")}}selected{{end}}>All</option>
