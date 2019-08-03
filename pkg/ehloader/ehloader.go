@@ -29,7 +29,9 @@ type Gallery struct {
 	Token        string
 	ArchiverKey  string
 	Title        string
+	TitleExt     Title
 	TitleJpn     string
+	TitleJpnExt  Title
 	Category     string
 	Thumb        string
 	Uploader     string
@@ -42,6 +44,15 @@ type Gallery struct {
 	Tags         map[string][]string
 	Exists       bool
 	ExistsIn     string
+}
+
+type Title struct {
+	Convention string
+	Group string
+	Artist string
+	Title string
+	Parody string
+	Translation string
 }
 
 type TagK = string

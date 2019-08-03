@@ -227,6 +227,8 @@ s:after{content:'';display:block;width:100%;height:50%;position:absolute;top:-1p
 #dms>div>select{position:absolute;top:-13px;left:0;font-weight:bold;font-size:10pt;width:120px;padding:3px}
 .dmsp>div>select{top:-31px !important}
 
+.gldbg{display:none}
+
 /* category buttons */
 .cs[data-disabled],.cn[data-disabled],.cw[data-disabled]{opacity:0.4}
 .cs[data-disabled]:hover,.cn[data-disabled]:hover,.cw[data-disabled]:hover{opacity:0.6}

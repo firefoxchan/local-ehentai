@@ -2,6 +2,7 @@ package ehloader
 
 import (
 	"math"
+	"regexp"
 	"strconv"
 	"strings"
 	"sync"
@@ -44,6 +45,8 @@ func handleJGallery(j JGallery) {
 		TorrentCount: 0,
 		Tags:         map[TagK][]TagV{},
 	}
+	gallery.TitleExt = parseTitle(gallery.Title)
+	gallery.TitleJpnExt = parseTitle(gallery.TitleJpn)
 	{
 		posted, e := strconv.ParseInt(j.Posted, 10, 64)
 		if e != nil {
@@ -111,6 +114,63 @@ func handleJGallery(j JGallery) {
 		appendTagKVG(TagKExists, TagVExistsFalse, j.GId)
 	}
 	galleries[j.GId] = gallery
+}
+
+var titleParseRes = []*regexp.Regexp{
+	regexp.MustCompile(`(?P<convention>\([^)]+\))?[ ]*(?P<groupArtist>\[[^]]+])?(?P<title>[^([]*)(?P<parody>\([^)]+\))?[ ]*(?P<translation>\[[^]]+])?`),
+}
+
+func parseTitle (title string) Title {
+	t := Title{
+		Convention:  "",
+		Group:       "",
+		Artist:      "",
+		Title:       "",
+		Parody:      "",
+		Translation: "",
+	}
+	matchedSet := map[string]struct{}{}
+	for _, re := range titleParseRes {
+		groupNames := re.SubexpNames()
+		for _, match := range re.FindAllStringSubmatch(title, -1) {
+			for groupIdx, matched := range match {
+				name := groupNames[groupIdx]
+				if name == "" {
+					name = "*"
+				}
+				if _, ok := matchedSet[name]; ok {
+					continue
+				}
+				matched := strings.ToLower(strings.TrimSpace(matched))
+				if matched == "" {
+					continue
+				}
+				matchedSet[name] = struct{}{}
+				switch name {
+				case "convention":
+					t.Convention = strings.Trim(matched, "() ")
+				case "title":
+					t.Title = matched
+				case "parody":
+					t.Parody = strings.Trim(matched, "() ")
+				case "translation":
+					t.Translation = strings.Trim(matched, "[] ")
+				case "groupArtist":
+					matched = strings.Trim(matched, "[] ")
+					if strings.Contains(matched, "(") && strings.HasSuffix(matched, ")") {
+						// group (artist)
+						matched = strings.TrimSuffix(matched, ")")
+						pairs := strings.SplitN(matched, "(", 2)
+						t.Group = strings.TrimSpace(pairs[0])
+						t.Artist = strings.TrimSpace(pairs[1])
+					} else {
+						t.Artist = matched
+					}
+				}
+			}
+		}
+	}
+	return t
 }
 
 func existsIn(gid int, set map[int]struct{}) bool {
