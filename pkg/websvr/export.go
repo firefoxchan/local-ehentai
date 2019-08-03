@@ -13,7 +13,7 @@ import (
 )
 
 func exportCSV(pq parsedQuery, writer http.ResponseWriter, request *http.Request) {
-	gs, _ := ehloader.SearchQ(0, -1, pq.Q)
+	gs, _ := ehloader.SearchQ(pq.OrderBy, 0, -1, pq.Q)
 	writer.Header().Set("Content-Type", "text/csv; charset=utf-8")
 	writer.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="export.%s.csv"`, time.Now().Format("20060102150405")))
 	// compatible with excel
@@ -81,7 +81,7 @@ func exportCSV(pq parsedQuery, writer http.ResponseWriter, request *http.Request
 }
 
 func exportJSON(pq parsedQuery, writer http.ResponseWriter, request *http.Request) {
-	gs, _ := ehloader.SearchQ(0, -1, pq.Q)
+	gs, _ := ehloader.SearchQ(pq.OrderBy, 0, -1, pq.Q)
 	writer.Header().Set("Content-Type", "application/json; charset=utf-8")
 	writer.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="export.%s.json"`, time.Now().Format("20060102150405")))
 	if _, e := writer.Write([]byte{'{'}); e != nil {

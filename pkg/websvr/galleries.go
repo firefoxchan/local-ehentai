@@ -38,7 +38,7 @@ func galleries(replaceThumbs bool, thumbs string) func(writer http.ResponseWrite
 			exportJSON(pq, writer, request)
 			return
 		}
-		gs, total := ehloader.SearchQ(pq.Offset, pq.Limit, pq.Q)
+		gs, total := ehloader.SearchQ(pq.OrderBy, pq.Offset, pq.Limit, pq.Q)
 		maxPage := total / pq.Limit
 		if total%pq.Limit != 0 {
 			maxPage++
@@ -197,12 +197,6 @@ const (
 	exportModeJSON
 )
 
-const (
-	orderByGId = iota
-	orderByPosted
-	orderByRating
-)
-
 func parseQuery(values url.Values) parsedQuery {
 	const limit = 10
 	page, _ := strconv.ParseInt(values.Get("page"), 10, 64)
@@ -269,12 +263,12 @@ func parseQuery(values url.Values) parsedQuery {
 	}
 	// order
 	fOrder := strings.ToLower(strings.TrimSpace(values.Get("f_order")))
-	orderBy := orderByGId
+	orderBy := ehloader.OrderByGId
 	switch fOrder {
 	case "posted":
-		orderBy = orderByPosted
+		orderBy = ehloader.OrderByPosted
 	case "rating":
-		orderBy = orderByRating
+		orderBy = ehloader.OrderByRating
 	}
 	// export
 	export := strings.ToLower(strings.TrimSpace(values.Get("export")))
