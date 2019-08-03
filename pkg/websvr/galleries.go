@@ -183,7 +183,7 @@ type parsedQuery struct {
 	Offset  int
 	Limit   int
 	Export  int
-	OrderBy int
+	OrderBy string
 	Q       ehloader.Q
 	Values  url.Values
 	FSearch string

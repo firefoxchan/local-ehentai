@@ -3,9 +3,9 @@ package ehloader
 import "sort"
 
 const (
-	OrderByGId = iota
-	OrderByPosted
-	OrderByRating
+	OrderByGId    = ""
+	OrderByPosted = "posted"
+	OrderByRating = "rating"
 )
 
 type sortPosted []int

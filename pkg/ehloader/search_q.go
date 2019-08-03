@@ -1,6 +1,7 @@
 package ehloader
 
 import (
+	"fmt"
 	"github.com/firefoxchan/local-ehentai/pkg/cache"
 	"sort"
 	"strings"
@@ -9,22 +10,22 @@ import (
 
 var searchQCache = cache.NewCache(time.Minute)
 
-func SearchQ(orderBy int, offset, limit int, q Q) ([]*Gallery, int) {
-	cacheKey := q.Dump("", "", "")
+func SearchQ(orderBy string, offset, limit int, q Q) ([]*Gallery, int) {
+	cacheKey := fmt.Sprintf("%s:%s", orderBy, q.Dump("", "", ""))
 	var match []int
 	if cached, ok := searchQCache.Get(cacheKey, 10*time.Minute); ok {
 		match = cached.([]int)
 		logger.Printf("SearchQ (cached): %d, %d, %s", offset, limit, cacheKey)
 	} else {
 		match = searchQ(q)
+		switch orderBy {
+		case OrderByPosted:
+			sort.Sort(sortPosted(match))
+		case OrderByRating:
+			sort.Sort(sortRating(match))
+		}
 		logger.Printf("SearchQ: %d, %d, %s", offset, limit, cacheKey)
 		searchQCache.Set(cacheKey, match, 10*time.Minute)
-	}
-	switch orderBy {
-	case OrderByPosted:
-		sort.Sort(sortPosted(match))
-	case OrderByRating:
-		sort.Sort(sortRating(match))
 	}
 	sliced := rSlice(match, offset, limit)
 	gs := make([]*Gallery, len(sliced))
