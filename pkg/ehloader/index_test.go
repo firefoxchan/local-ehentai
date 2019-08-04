@@ -4,7 +4,7 @@ import "testing"
 
 func TestParseTitle(t *testing.T) {
 	titles := map[string]map[string]string{
-		`(C99) [The.GR OU P (ArTi S T)] tit L E (P a.ro,dy) [翻訳]`: {
+		`123.(C99) [The.GR OU P (ArTi S T)] tit L E (P a.ro,dy) [翻訳] [translator].zip`: {
 			rIdxTitleConvention:  "c99",
 			rIdxTitleGroup:       "the.gr ou p",
 			rIdxTitleArtist:      "arti s t",

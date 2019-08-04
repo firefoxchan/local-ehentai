@@ -65,21 +65,21 @@ const (
 // rIdx
 const (
 	// title
-	TagKRIdxTitlePrefix      TagK = "title"
-	TagKRIdxTitleConvention  TagK = TagKRIdxTitlePrefix + " " + rIdxTitleConvention
-	TagKRIdxTitleGroup       TagK = TagKRIdxTitlePrefix + " " + rIdxTitleGroup
-	TagKRIdxTitleArtist      TagK = TagKRIdxTitlePrefix + " " + rIdxTitleArtist
-	TagKRIdxTitleTitle       TagK = TagKRIdxTitlePrefix + " " + rIdxTitleTitle
-	TagKRIdxTitleParody      TagK = TagKRIdxTitlePrefix + " " + rIdxTitleParody
-	TagKRIdxTitleTranslation TagK = TagKRIdxTitlePrefix + " " + rIdxTitleTranslation
+	TagKRIdxTitlePrefix      TagK = "title "
+	TagKRIdxTitleConvention  TagK = TagKRIdxTitlePrefix + rIdxTitleConvention
+	TagKRIdxTitleGroup       TagK = TagKRIdxTitlePrefix + rIdxTitleGroup
+	TagKRIdxTitleArtist      TagK = TagKRIdxTitlePrefix + rIdxTitleArtist
+	TagKRIdxTitleTitle       TagK = TagKRIdxTitlePrefix + rIdxTitleTitle
+	TagKRIdxTitleParody      TagK = TagKRIdxTitlePrefix + rIdxTitleParody
+	TagKRIdxTitleTranslation TagK = TagKRIdxTitlePrefix + rIdxTitleTranslation
 	// title jpn
-	TagKRIdxTitleJpnPrefix      TagK = "title_jpn"
-	TagKRIdxTitleJpnConvention  TagK = TagKRIdxTitleJpnPrefix + " " + rIdxTitleConvention
-	TagKRIdxTitleJpnGroup       TagK = TagKRIdxTitleJpnPrefix + " " + rIdxTitleGroup
-	TagKRIdxTitleJpnArtist      TagK = TagKRIdxTitleJpnPrefix + " " + rIdxTitleArtist
-	TagKRIdxTitleJpnTitle       TagK = TagKRIdxTitleJpnPrefix + " " + rIdxTitleTitle
-	TagKRIdxTitleJpnParody      TagK = TagKRIdxTitleJpnPrefix + " " + rIdxTitleParody
-	TagKRIdxTitleJpnTranslation TagK = TagKRIdxTitleJpnPrefix + " " + rIdxTitleTranslation
+	TagKRIdxTitleJpnPrefix      TagK = "title_jpn "
+	TagKRIdxTitleJpnConvention  TagK = TagKRIdxTitleJpnPrefix + rIdxTitleConvention
+	TagKRIdxTitleJpnGroup       TagK = TagKRIdxTitleJpnPrefix + rIdxTitleGroup
+	TagKRIdxTitleJpnArtist      TagK = TagKRIdxTitleJpnPrefix + rIdxTitleArtist
+	TagKRIdxTitleJpnTitle       TagK = TagKRIdxTitleJpnPrefix + rIdxTitleTitle
+	TagKRIdxTitleJpnParody      TagK = TagKRIdxTitleJpnPrefix + rIdxTitleParody
+	TagKRIdxTitleJpnTranslation TagK = TagKRIdxTitleJpnPrefix + rIdxTitleTranslation
 )
 
 const (

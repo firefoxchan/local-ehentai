@@ -24,6 +24,7 @@ func Index(jsonPath string, urlPath string, fileDirPath string, fileMapPath stri
 	if e := indexJsonFast(jsonPath); e != nil {
 		return  e
 	}
+	sortTags()
 	if urlPath != "" {
 		matchedGs, e := indexURLList(urlPath)
 		if e != nil {
@@ -40,18 +41,26 @@ func Index(jsonPath string, urlPath string, fileDirPath string, fileMapPath stri
 	}
 	linkGalleries()
 	sortTags()
+	dumpTags()
 	logger.Printf("Force GC.\n")
 	runtime.GC()
 	return nil
 }
 
 func sortTags () {
+	for _, tagVs := range tags {
+		for value := range tagVs {
+			sort.Ints(tagVs[value])
+		}
+	}
+}
+
+func dumpTags () {
 	tagDumps := make([]string, 0)
 	const tagDumpMinLength = 100
 	for tagK, tagVs := range tags {
 		tagKDumps := make([]string, 0)
 		for value := range tagVs {
-			sort.Ints(tagVs[value])
 			if len(tagVs[value]) > tagDumpMinLength {
 				tagKDumps = append(tagKDumps, fmt.Sprintf("%s:%d", value, len(tagVs[value])))
 			}
@@ -150,10 +159,10 @@ func handleJGallery(j JGallery) {
 	// title
 	for _, rIdx := range rIdxTitleAll {
 		if gallery.TitleExt[rIdx] != "" {
-			appendTagKVG(TagKRIdxTitlePrefix + " " + rIdx, gallery.TitleExt[rIdx], j.GId)
+			appendTagKVG(TagKRIdxTitlePrefix + rIdx, gallery.TitleExt[rIdx], j.GId)
 		}
 		if gallery.TitleJpnExt[rIdx] != "" {
-			appendTagKVG(TagKRIdxTitleJpnPrefix + " " + rIdx, gallery.TitleJpnExt[rIdx], j.GId)
+			appendTagKVG(TagKRIdxTitleJpnPrefix + rIdx, gallery.TitleJpnExt[rIdx], j.GId)
 		}
 	}
 	galleries[j.GId] = gallery
@@ -185,7 +194,7 @@ func linkGalleries ()  {
 }
 
 var titleParseRes = []*regexp.Regexp{
-	regexp.MustCompile(`(?P<convention>\([^)]+\))?[ ]*(?P<groupArtist>\[[^]]+])?(?P<title>[^([]*)(?P<parody>\([^)]+\))?[ ]*(?P<translation>\[[^]]+])?`),
+	regexp.MustCompile(`(?P<prefix>[\d.]+)?(?P<convention>\([^)]+\))?[ ]*(?P<groupArtist>\[[^]]+])?(?P<title>[^([]*)(?P<parody>\([^)]+\))?[ ]*(?P<translation>\[[^]]+])?(?P<translator>\[[^]]+])?`),
 }
 
 const (
@@ -215,39 +224,38 @@ func parseTitle (title string) map[string]string {
 	t := map[string]string{}
 	for _, re := range titleParseRes {
 		groupNames := re.SubexpNames()
-		for _, match := range re.FindAllStringSubmatch(title, -1) {
-			for groupIdx, matched := range match {
-				name := groupNames[groupIdx]
-				if name == "" {
-					name = "*"
-				}
-				if _, ok := t[name]; ok {
-					continue
-				}
-				matched := strings.ToLower(strings.TrimSpace(matched))
-				if matched == "" {
-					continue
-				}
-				switch name {
-				case "convention":
-					t[rIdxTitleConvention] = strings.Trim(matched, "() ")
-				case "title":
-					t[rIdxTitleTitle] = matched
-				case "parody":
-					t[rIdxTitleParody] = strings.Trim(matched, "() ")
-				case "translation":
-					t[rIdxTitleTranslation] = strings.Trim(matched, "[] ")
-				case "groupArtist":
-					matched = strings.Trim(matched, "[] ")
-					if strings.Contains(matched, "(") && strings.HasSuffix(matched, ")") {
-						// group (artist)
-						matched = strings.TrimSuffix(matched, ")")
-						pairs := strings.SplitN(matched, "(", 2)
-						t[rIdxTitleGroup] = strings.TrimSpace(pairs[0])
-						t[rIdxTitleArtist] = strings.TrimSpace(pairs[1])
-					} else {
-						t[rIdxTitleArtist] = matched
-					}
+		match := re.FindStringSubmatch(title)
+		for groupIdx, matched := range match {
+			name := groupNames[groupIdx]
+			if name == "" {
+				name = "*"
+			}
+			if _, ok := t[name]; ok {
+				continue
+			}
+			matched := strings.ToLower(strings.TrimSpace(matched))
+			if matched == "" {
+				continue
+			}
+			switch name {
+			case "convention":
+				t[rIdxTitleConvention] = strings.Trim(matched, "() ")
+			case "title":
+				t[rIdxTitleTitle] = matched
+			case "parody":
+				t[rIdxTitleParody] = strings.Trim(matched, "() ")
+			case "translation":
+				t[rIdxTitleTranslation] = strings.Trim(matched, "[] ")
+			case "groupArtist":
+				matched = strings.Trim(matched, "[] ")
+				if strings.Contains(matched, "(") && strings.HasSuffix(matched, ")") {
+					// group (artist)
+					matched = strings.TrimSuffix(matched, ")")
+					pairs := strings.SplitN(matched, "(", 2)
+					t[rIdxTitleGroup] = strings.TrimSpace(pairs[0])
+					t[rIdxTitleArtist] = strings.TrimSpace(pairs[1])
+				} else {
+					t[rIdxTitleArtist] = matched
 				}
 			}
 		}

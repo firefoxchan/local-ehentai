@@ -77,6 +77,14 @@ func searchQMatch(k TagK, v TagV, mode matchMode) []int {
 				// special tags
 				continue
 			default:
+				if strings.HasPrefix(k, TagKRIdxTitlePrefix) {
+					// special tags
+					continue
+				}
+				if strings.HasPrefix(k, TagKRIdxTitleJpnPrefix) {
+					// special tags
+					continue
+				}
 				// pass
 			}
 			if match, ok := matchTagKV(k, v, mode); ok {

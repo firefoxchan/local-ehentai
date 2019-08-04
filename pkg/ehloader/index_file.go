@@ -2,10 +2,23 @@ package ehloader
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
+)
+
+var indexFilesWinPathReplacer = strings.NewReplacer(
+	`/`, ``,
+	`\`, ``,
+	`:`, ``,
+	`*`, ``,
+	`?`, ``,
+	`"`, ``,
+	`<`, ``,
+	`>`, ``,
+	`|`, ``,
 )
 
 func indexFiles(dirPath string, mapPath string) (map[int][]string, error) {
@@ -15,30 +28,107 @@ func indexFiles(dirPath string, mapPath string) (map[int][]string, error) {
 		return nil, e
 	}
 	matchedFiles := map[int][]string{}
-	unmatchedFiles := make([]string, 0)
+	appendMatch := func (fn, path string, gid int) {
+		if _, ok := matchedFiles[gid]; !ok {
+			matchedFiles[gid] = make([]string, 0)
+		}
+		matchedFiles[gid] = append(matchedFiles[gid], path)
+	}
+	unmatchedFileList := make([]string, 0)
+	unmatchedFileTitles := map[string]map[string]string{}
 	if e := filepath.Walk(dirPath, func(path string, info os.FileInfo, e error) error {
 		if e != nil {
-			return e
+			logger.Printf("Walk files dir error: %s", e)
+			return nil
 		}
 		if info.IsDir() {
 			return nil
 		}
 		fn := info.Name()
 		if gid, ok := fnMap[fn]; ok {
-			if _, ok := matchedFiles[gid]; !ok {
-				matchedFiles[gid] = make([]string, 0)
-			}
-			matchedFiles[gid] = append(matchedFiles[gid], path)
+			appendMatch(fn, path, gid)
 			return nil
 		}
-		// TODO: edit distance based match
-		unmatchedFiles = append(unmatchedFiles, path)
+		title := parseTitle(fn)
+		if title[rIdxTitleTitle] != "" {
+			qsTitle := make([]Q, 0)
+			qsTitleJpn := make([]Q, 0)
+			for _, rIdx := range rIdxTitleAll {
+				if rIdx == rIdxTitleTitle {
+					continue
+				}
+				if title[rIdx] != "" {
+					qsTitle = append(qsTitle, Eq(TagKRIdxTitlePrefix + rIdx, title[rIdx]))
+					qsTitleJpn = append(qsTitleJpn, Eq(TagKRIdxTitleJpnPrefix + rIdx, title[rIdx]))
+				}
+			}
+			if len(qsTitle) != 0 {
+				q := Or(And(qsTitle...), And(qsTitleJpn...))
+				matched := searchQ(q)
+				if strings.Contains(path, "DL") {
+					logger.Printf("%s, %v", q.Dump("", "", ""), matched)
+				}
+				isMatched := false
+				for _, gid := range matched {
+					g := galleries[gid]
+					if indexFileMatchTitle(g.TitleExt[rIdxTitleTitle], title[rIdxTitleTitle]) {
+						appendMatch(fn, path, gid)
+						isMatched = true
+					}
+					if indexFileMatchTitle(g.TitleJpnExt[rIdxTitleTitle], title[rIdxTitleTitle]) {
+						// match
+						appendMatch(fn, path, gid)
+						isMatched = true
+					}
+					// TODO: edit distance based title match
+				}
+				if isMatched {
+					return nil
+				}
+			}
+		} else {
+			// TODO: edit distance based full match
+		}
+		unmatchedFileTitles[path] = title
+		unmatchedFileList = append(unmatchedFileList, path)
 		return nil
 	}); e != nil {
 		return nil, e
 	}
-	logger.Printf("Unmatched files: (%d)\n  %s", len(unmatchedFiles), strings.Join(unmatchedFiles, "\n  "))
+	if len(unmatchedFileTitles) > 0 {
+		lines := make([]string, 0)
+		for _, path := range unmatchedFileList {
+			lines = append(lines, fmt.Sprintf("%s -> %v", path, unmatchedFileTitles[path]))
+		}
+		logger.Printf("Unmatched files: (%d)\n  %s", len(unmatchedFileTitles), strings.Join(lines, "\n  "))
+	}
 	return matchedFiles, nil
+}
+
+func indexFileMatchTitle (source, fn string) bool {
+	source = indexFilesWinPathReplacer.Replace(source)
+	fn = indexFilesWinPathReplacer.Replace(fn)
+	source = strings.Join(split(source, " "), " ")
+	fn = strings.Join(split(fn, " "), " ")
+	if strings.Contains(source, fn) {
+		return true
+	}
+	if strings.Contains(fn, source) {
+		return true
+	}
+	return false
+}
+
+func split (s string, sep string) []string {
+	sl := strings.Split(s, sep)
+	ret := make([]string, 0, len(sl))
+	for _, s := range sl {
+		s = strings.TrimSpace(s)
+		if s != "" {
+			ret = append(ret, s)
+		}
+	}
+	return ret
 }
 
 func indexFileMap (mapPath string) (map[string]int, error) {
