@@ -169,6 +169,7 @@ func handleJGallery(j JGallery) {
 }
 
 func linkGalleries() {
+	count := 0
 	for gid := range galleries {
 		// exists
 		g := galleries[gid]
@@ -189,6 +190,13 @@ func linkGalleries() {
 		}
 		if !g.Exists {
 			appendTagKVG(TagKExists, TagVExistsFalse, gid)
+		}
+		count++
+		if count % 100000 == 0 {
+			if runtime.GOARCH == `386` {
+				logger.Printf("Force GC.\n")
+				runtime.GC()
+			}
 		}
 	}
 }
