@@ -22,7 +22,7 @@ func Index(jsonPath string, urlPath string, fileDirPath string, fileMapPath stri
 	indexMu.Lock()
 	defer indexMu.Unlock()
 	if e := indexJsonFast(jsonPath); e != nil {
-		return  e
+		return e
 	}
 	sortTags()
 	if urlPath != "" {
@@ -47,7 +47,7 @@ func Index(jsonPath string, urlPath string, fileDirPath string, fileMapPath stri
 	return nil
 }
 
-func sortTags () {
+func sortTags() {
 	for _, tagVs := range tags {
 		for value := range tagVs {
 			sort.Ints(tagVs[value])
@@ -55,7 +55,7 @@ func sortTags () {
 	}
 }
 
-func dumpTags () {
+func dumpTags() {
 	tagDumps := make([]string, 0)
 	const tagDumpMinLength = 100
 	for tagK, tagVs := range tags {
@@ -159,16 +159,16 @@ func handleJGallery(j JGallery) {
 	// title
 	for _, rIdx := range rIdxTitleAll {
 		if gallery.TitleExt[rIdx] != "" {
-			appendTagKVG(TagKRIdxTitlePrefix + rIdx, gallery.TitleExt[rIdx], j.GId)
+			appendTagKVG(TagKRIdxTitlePrefix+rIdx, gallery.TitleExt[rIdx], j.GId)
 		}
 		if gallery.TitleJpnExt[rIdx] != "" {
-			appendTagKVG(TagKRIdxTitleJpnPrefix + rIdx, gallery.TitleJpnExt[rIdx], j.GId)
+			appendTagKVG(TagKRIdxTitleJpnPrefix+rIdx, gallery.TitleJpnExt[rIdx], j.GId)
 		}
 	}
 	galleries[j.GId] = gallery
 }
 
-func linkGalleries ()  {
+func linkGalleries() {
 	for gid := range galleries {
 		// exists
 		g := galleries[gid]
@@ -205,6 +205,7 @@ const (
 	rIdxTitleParody      = "parody"
 	rIdxTitleTranslation = "translation"
 )
+
 var rIdxTitleAll = []string{
 	rIdxTitleConvention,
 	rIdxTitleGroup,
@@ -219,7 +220,7 @@ var titleSPCharReplacer = strings.NewReplacer(
 	`（`, `(`, `）`, `)`, `［`, `[`, `］`, `]`,
 )
 
-func parseTitle (title string) map[string]string {
+func parseTitle(title string) map[string]string {
 	title = titleSPCharReplacer.Replace(title)
 	t := map[string]string{}
 	for _, re := range titleParseRes {

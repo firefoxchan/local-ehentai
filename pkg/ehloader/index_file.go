@@ -28,7 +28,7 @@ func indexFiles(dirPath string, mapPath string) (map[int][]string, error) {
 		return nil, e
 	}
 	matchedFiles := map[int][]string{}
-	appendMatch := func (fn, path string, gid int) {
+	appendMatch := func(fn, path string, gid int) {
 		if _, ok := matchedFiles[gid]; !ok {
 			matchedFiles[gid] = make([]string, 0)
 		}
@@ -50,7 +50,7 @@ func indexFiles(dirPath string, mapPath string) (map[int][]string, error) {
 			return nil
 		}
 		// trim ext
-		fn = fn[0:len(fn) - len(filepath.Ext(fn))]
+		fn = fn[0 : len(fn)-len(filepath.Ext(fn))]
 		if gid, ok := fnMap[fn]; ok {
 			appendMatch(fn, path, gid)
 			return nil
@@ -64,8 +64,8 @@ func indexFiles(dirPath string, mapPath string) (map[int][]string, error) {
 					continue
 				}
 				if title[rIdx] != "" {
-					qsTitle = append(qsTitle, Eq(TagKRIdxTitlePrefix + rIdx, title[rIdx]))
-					qsTitleJpn = append(qsTitleJpn, Eq(TagKRIdxTitleJpnPrefix + rIdx, title[rIdx]))
+					qsTitle = append(qsTitle, Eq(TagKRIdxTitlePrefix+rIdx, title[rIdx]))
+					qsTitleJpn = append(qsTitleJpn, Eq(TagKRIdxTitleJpnPrefix+rIdx, title[rIdx]))
 				}
 			}
 			if len(qsTitle) != 0 {
@@ -111,7 +111,7 @@ func indexFiles(dirPath string, mapPath string) (map[int][]string, error) {
 	return matchedFiles, nil
 }
 
-func indexFileMatchTitle (source, fn string) bool {
+func indexFileMatchTitle(source, fn string) bool {
 	source = indexFilesWinPathReplacer.Replace(source)
 	fn = indexFilesWinPathReplacer.Replace(fn)
 	source = strings.Join(split(source, " "), " ")
@@ -125,7 +125,7 @@ func indexFileMatchTitle (source, fn string) bool {
 	return false
 }
 
-func split (s string, sep string) []string {
+func split(s string, sep string) []string {
 	sl := strings.Split(s, sep)
 	ret := make([]string, 0, len(sl))
 	for _, s := range sl {
@@ -137,7 +137,7 @@ func split (s string, sep string) []string {
 	return ret
 }
 
-func indexFileMap (mapPath string) (map[string]int, error) {
+func indexFileMap(mapPath string) (map[string]int, error) {
 	fnMap := make(map[string]int, 0)
 	if mapPath != "" {
 		f, e := os.OpenFile(mapPath, os.O_RDONLY, 0)

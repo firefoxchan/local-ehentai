@@ -17,15 +17,15 @@ import (
 
 func main() {
 	var (
-		jsonPath     string
-		urlListPath  string
+		jsonPath    string
+		urlListPath string
 		fileMapPath string
-		fileDirPath  string
-		thumbsPath   string
-		format       string
-		host         string
-		pprofHost    string
-		mode         string
+		fileDirPath string
+		thumbsPath  string
+		format      string
+		host        string
+		pprofHost   string
+		mode        string
 	)
 	flag.StringVar(&jsonPath, "j", "", "path to eh api json file")
 	flag.StringVar(&jsonPath, "json", "", "path to eh api json file")
