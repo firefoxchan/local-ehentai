@@ -49,6 +49,12 @@ func indexFiles(dirPath string, mapPath string) (map[int][]string, error) {
 			appendMatch(fn, path, gid)
 			return nil
 		}
+		// trim ext
+		fn = fn[0:len(fn) - len(filepath.Ext(fn))]
+		if gid, ok := fnMap[fn]; ok {
+			appendMatch(fn, path, gid)
+			return nil
+		}
 		title := parseTitle(fn)
 		if title[rIdxTitleTitle] != "" {
 			qsTitle := make([]Q, 0)
