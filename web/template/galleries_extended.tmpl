@@ -131,7 +131,7 @@
                                 <select id="local-file-select" class="imr" name="f_local_files">
                                     <option value="" {{if (eq (.Values.Get "f_local_files") "")}}selected{{end}}>All</option>
                                     <option value="1" {{if (eq (.Values.Get "f_local_files") "1")}}selected{{end}}>Exist files</option>
-                                    <option value="0" {{if (eq (.Values.Get "f_local_files") "2")}}selected{{end}}>Not exist files</option>
+                                    <option value="0" {{if (eq (.Values.Get "f_local_files") "0")}}selected{{end}}>Not exist files</option>
                                 </select>
                             </td>
                             <td class="ic2" colspan="2">
@@ -281,6 +281,18 @@
                                     </tr>
                                     </tbody>
                                 </table>
+                            </div>
+
+                            <div class="glink">
+                                {{if .ExistFiles}}Files
+                                <table style="font-size: 10pt;">
+                                    <tbody>
+                                    {{range .ExistFiles}}
+                                        <tr><td>{{.}}</td></tr>
+                                    {{end}}
+                                    </tbody>
+                                </table>
+                                {{end}}
                             </div>
 
                         </div>

@@ -17,18 +17,22 @@ import (
 
 func main() {
 	var (
-		jsonPath        string
-		urlPath         string
-		thumbsPath      string
-		format          string
-		host            string
-		pprofHost       string
-		mode            string
+		jsonPath     string
+		urlListPath  string
+		fileMapPath string
+		fileDirPath  string
+		thumbsPath   string
+		format       string
+		host         string
+		pprofHost    string
+		mode         string
 	)
 	flag.StringVar(&jsonPath, "j", "", "path to eh api json file")
 	flag.StringVar(&jsonPath, "json", "", "path to eh api json file")
-	flag.StringVar(&urlPath, "u", "", "path to exists url list file")
-	flag.StringVar(&urlPath, "existUrls", "", "path to exists url list file")
+	flag.StringVar(&urlListPath, "u", "", "path to exists url list file")
+	flag.StringVar(&urlListPath, "existUrls", "", "path to exists url list file")
+	flag.StringVar(&fileMapPath, "filesMap", "", "path to filename map file")
+	flag.StringVar(&fileDirPath, "files", "", "path to files dir")
 	flag.StringVar(&thumbsPath, "t", "", "path to thumbs dir")
 	flag.StringVar(&thumbsPath, "thumbs", "", "path to thumbs dir")
 	flag.StringVar(&format, "f", "dense", "output format. dense, json")
@@ -41,13 +45,15 @@ func main() {
 	flag.StringVar(&mode, "mode", "http", "start mode. cmd, http")
 	flag.Parse()
 	setDefaultPath(&jsonPath, "gdata.json", nil)
-	setDefaultPath(&urlPath, "existUrls.txt", nil)
+	setDefaultPath(&urlListPath, "existUrls.txt", nil)
+	setDefaultPath(&fileMapPath, "filesMap.txt", nil)
+	setDefaultPath(&fileDirPath, "files", func(fi os.FileInfo) bool { return fi.IsDir() })
 	setDefaultPath(&thumbsPath, "thumbs", func(fi os.FileInfo) bool { return fi.IsDir() })
 	if jsonPath == "" {
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
-	if e := ehloader.Index(jsonPath, urlPath); e != nil {
+	if e := ehloader.Index(jsonPath, urlListPath, fileDirPath, fileMapPath); e != nil {
 		panic(e)
 	}
 	switch mode {

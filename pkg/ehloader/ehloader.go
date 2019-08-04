@@ -44,6 +44,7 @@ type Gallery struct {
 	Tags         map[string][]string
 	Exists       bool
 	ExistsIn     string
+	ExistFiles   []string
 }
 
 type TagK = string
@@ -67,6 +68,7 @@ const (
 	TagVExistsFalse   TagV = "0"
 	TagVExistsTrue    TagV = "1"
 	TagVExistsInURL   TagV = "url"
+	TagVExistsInFile  TagV = "file"
 )
 
 var logger = log.New(os.Stderr, "[ehloader]", log.Lshortfile|log.LstdFlags)

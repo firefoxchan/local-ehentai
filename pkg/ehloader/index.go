@@ -1,8 +1,11 @@
 package ehloader
 
 import (
+	"fmt"
 	"math"
 	"regexp"
+	"runtime"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -11,14 +14,18 @@ import (
 
 var tags map[TagK]map[TagV][]int
 var galleries map[int]*Gallery
-var gExistsInUrls map[int]struct{}
 var rIdxTitle map[string]map[string][]int
 var rIdxTitleJpn map[string]map[string][]int
+var gExistsInUrls map[int]struct{}
+var gExistsInFiles map[int][]string
 var indexMu sync.RWMutex
 
-func Index(jsonPath string, urlPath string) error {
+func Index(jsonPath string, urlPath string, fileDirPath string, fileMapPath string) error {
 	indexMu.Lock()
 	defer indexMu.Unlock()
+	if e := indexJsonFast(jsonPath); e != nil {
+		return  e
+	}
 	if urlPath != "" {
 		matchedGs, e := indexURLList(urlPath)
 		if e != nil {
@@ -26,7 +33,45 @@ func Index(jsonPath string, urlPath string) error {
 		}
 		gExistsInUrls = matchedGs
 	}
-	return indexJsonFast(jsonPath)
+	if fileDirPath != "" {
+		matchedFiles, e := indexFiles(fileDirPath, fileMapPath)
+		if e != nil {
+			return e
+		}
+		gExistsInFiles = matchedFiles
+	}
+	linkGalleries()
+	sortTags()
+	logger.Printf("Force GC.\n")
+	runtime.GC()
+	return nil
+}
+
+func sortTags () {
+	tagDumps := make([]string, 0)
+	const tagDumpMinLength = 100
+	for tagK, tagVs := range tags {
+		tagKDumps := make([]string, 0)
+		for value := range tagVs {
+			sort.Ints(tagVs[value])
+			if len(tagVs[value]) > tagDumpMinLength {
+				tagKDumps = append(tagKDumps, fmt.Sprintf("%s:%d", value, len(tagVs[value])))
+			}
+		}
+		switch tagK {
+		case "male", "female", "misc", "language":
+			// pass
+		default:
+			continue
+		}
+		tagDumps = append(tagDumps, fmt.Sprintf("  %s:", tagK))
+		const oneLineLimit = 10
+		for oneLineLimit < len(tagKDumps) {
+			tagKDumps, tagDumps = tagKDumps[oneLineLimit:], append(tagDumps, fmt.Sprintf("    %s", strings.Join(tagKDumps[0:oneLineLimit:oneLineLimit], ", ")))
+		}
+		tagDumps = append(tagDumps, fmt.Sprintf("    %s", strings.Join(tagKDumps, ", ")))
+	}
+	logger.Printf("Tag stats (> %d):\n%s", tagDumpMinLength, strings.Join(tagDumps, "\n"))
 }
 
 func handleJGallery(j JGallery) {
@@ -104,18 +149,32 @@ func handleJGallery(j JGallery) {
 	for i := int64(0); i <= int64(math.Round(float64(gallery.Rating))); i++ {
 		appendTagKVG(TagKMinRating, strconv.FormatInt(i, 10), j.GId)
 	}
-	// exists
-	switch {
-	case existsIn(j.GId, gExistsInUrls):
-		gallery.Exists = true
-		appendTagKVG(TagKExists, TagVExistsTrue, j.GId)
-		gallery.ExistsIn = TagVExistsInURL
-		appendTagKVG(TagKExistsIn, TagVExistsInURL, j.GId)
-	default:
-		gallery.Exists = false
-		appendTagKVG(TagKExists, TagVExistsFalse, j.GId)
-	}
 	galleries[j.GId] = gallery
+}
+
+func linkGalleries ()  {
+	for gid := range galleries {
+		// exists
+		g := galleries[gid]
+		g.Exists = false
+		g.ExistFiles = make([]string, 0, 0)
+		if existsInSet(gid, gExistsInUrls) {
+			g.Exists = true
+			appendTagKVG(TagKExists, TagVExistsTrue, gid)
+			g.ExistsIn = TagVExistsInURL
+			appendTagKVG(TagKExistsIn, TagVExistsInURL, gid)
+		}
+		if existsInSS(gid, gExistsInFiles) {
+			g.Exists = true
+			appendTagKVG(TagKExists, TagVExistsTrue, gid)
+			g.ExistsIn = TagVExistsInFile
+			appendTagKVG(TagKExistsIn, TagVExistsInFile, gid)
+			g.ExistFiles = gExistsInFiles[gid]
+		}
+		if !g.Exists {
+			appendTagKVG(TagKExists, TagVExistsFalse, gid)
+		}
+	}
 }
 
 var titleParseRes = []*regexp.Regexp{
@@ -194,7 +253,12 @@ func parseTitle (title string) map[string]string {
 	return t
 }
 
-func existsIn(gid int, set map[int]struct{}) bool {
+func existsInSet(gid int, set map[int]struct{}) bool {
+	_, ok := set[gid]
+	return ok
+}
+
+func existsInSS(gid int, set map[int][]string) bool {
 	_, ok := set[gid]
 	return ok
 }

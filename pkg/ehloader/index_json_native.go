@@ -2,11 +2,7 @@ package ehloader
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
-	"runtime"
-	"sort"
-	"strings"
 )
 
 func indexJsonNative(path string) error {
@@ -37,32 +33,6 @@ func indexJsonNative(path string) error {
 		delete(jGalleries, i)
 	}
 	logger.Printf("Loading %d gallaries...\n", counter)
-	tagDumps := make([]string, 0)
-	const tagDumpMinLength = 100
-	for tagK, tagVs := range tags {
-		tagKDumps := make([]string, 0)
-		for value := range tagVs {
-			sort.Ints(tagVs[value])
-			if len(tagVs[value]) > tagDumpMinLength {
-				tagKDumps = append(tagKDumps, fmt.Sprintf("%s:%d", value, len(tagVs[value])))
-			}
-		}
-		switch tagK {
-		case "male", "female", "misc", "language", TagKCategory, TagKMinRating, TagKExpunged:
-			// pass
-		default:
-			continue
-		}
-		tagDumps = append(tagDumps, fmt.Sprintf("  %s:", tagK))
-		const oneLineLimit = 10
-		for oneLineLimit < len(tagKDumps) {
-			tagKDumps, tagDumps = tagKDumps[oneLineLimit:], append(tagDumps, fmt.Sprintf("    %s", strings.Join(tagKDumps[0:oneLineLimit:oneLineLimit], ", ")))
-		}
-		tagDumps = append(tagDumps, fmt.Sprintf("    %s", strings.Join(tagKDumps, ", ")))
-	}
-	logger.Printf("Tag stats (> %d):\n%s", tagDumpMinLength, strings.Join(tagDumps, "\n"))
 	logger.Printf("End Loading gallaries.\n")
-	logger.Printf("Force GC.\n")
-	runtime.GC()
 	return nil
 }
