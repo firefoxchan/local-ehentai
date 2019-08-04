@@ -47,6 +47,10 @@ func indexJsonFast(path string) error {
 		count++
 		if count%10000 == 0 {
 			logger.Printf("Parsed %d gallaries.\n", count)
+			if runtime.GOARCH == `386` {
+				logger.Printf("Force GC.\n")
+				runtime.GC()
+			}
 		}
 	}
 	close(rawJsonCh)
