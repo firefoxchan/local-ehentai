@@ -14,8 +14,6 @@ import (
 
 var tags map[TagK]map[TagV][]int
 var galleries map[int]*Gallery
-var rIdxTitle map[string]map[string][]int
-var rIdxTitleJpn map[string]map[string][]int
 var gExistsInUrls map[int]struct{}
 var gExistsInFiles map[int][]string
 var indexMu sync.RWMutex
@@ -149,6 +147,15 @@ func handleJGallery(j JGallery) {
 	for i := int64(0); i <= int64(math.Round(float64(gallery.Rating))); i++ {
 		appendTagKVG(TagKMinRating, strconv.FormatInt(i, 10), j.GId)
 	}
+	// title
+	for _, rIdx := range rIdxTitleAll {
+		if gallery.TitleExt[rIdx] != "" {
+			appendTagKVG(TagKRIdxTitlePrefix + " " + rIdx, gallery.TitleExt[rIdx], j.GId)
+		}
+		if gallery.TitleJpnExt[rIdx] != "" {
+			appendTagKVG(TagKRIdxTitleJpnPrefix + " " + rIdx, gallery.TitleJpnExt[rIdx], j.GId)
+		}
+	}
 	galleries[j.GId] = gallery
 }
 
@@ -182,12 +189,12 @@ var titleParseRes = []*regexp.Regexp{
 }
 
 const (
-	rIdxTitleConvention  = "Convention"
-	rIdxTitleGroup       = "Group"
-	rIdxTitleArtist      = "Artist"
-	rIdxTitleTitle       = "Title"
-	rIdxTitleParody      = "Parody"
-	rIdxTitleTranslation = "Translation"
+	rIdxTitleConvention  = "convention"
+	rIdxTitleGroup       = "group"
+	rIdxTitleArtist      = "artist"
+	rIdxTitleTitle       = "title"
+	rIdxTitleParody      = "parody"
+	rIdxTitleTranslation = "translation"
 )
 var rIdxTitleAll = []string{
 	rIdxTitleConvention,
