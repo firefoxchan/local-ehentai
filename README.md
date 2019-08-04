@@ -10,8 +10,7 @@ Local E-Hentai Gallery Index (with ~830k galleries' metadata)
 - Local thumbnails cache
 - Export search results as csv / json
 - Expunged / min-rating filter
-- (URL based) local files filter
-- [TODO] (Filename based) local files filter
+- (Filename / URL based) local files filter, with auto discover
 
 # Build
 
@@ -72,14 +71,23 @@ Will match
 
 ## Local Files Filter
 
+### Filename Based
+
+#### Auto Discover 
+
+1. Put your archive files under `files` directory (or sub directory)
+2. Restart local-ehentai.exe
+
+#### Manually Link File with Gallery
+
+1. Modify file `filesMap.txt` in the same directory with local-ehentai.exe
+2. Syntax: `filename/gallery_id`, eg: `abcd.zip/1234`
+3. Restart local-ehentai.exe
+
 ### URL Based
 
 1. Modify file `existUrls.txt` in the same directory with local-ehentai.exe
 2. Restart local-ehentai.exe
-
-### Filename Based
-
-TODO
 
 ## Enable Local Thumbnails Cache
 
@@ -90,6 +98,4 @@ If you have downloaded thumbnails form [this torrent](https://sukebei.nyaa.si/vi
 
 # Demo
 
-![Galleries](/assets/galleries_demo_v0.0.5_1.png)
-
-![Galleries](/assets/galleries_demo_v0.0.5.png)
+![Galleries](/assets/galleries_demo_v0.0.6.png)

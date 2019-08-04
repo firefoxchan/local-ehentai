@@ -8,8 +8,7 @@ Local E-Hentai Gallery Searcher
 - 本地缩略图缓存
 - 导出搜索结果为 csv / json
 - 根据是否被删除/最低评分过滤
-- 基于URL的本地文件过滤
-- [TODO] 基于文件名的本地文件过滤
+- 基于文件名/URL的本地文件过滤 & 自动匹配
 
 # 编译
 
@@ -69,15 +68,23 @@ tag留空时会搜索所有tag, value以$结尾时会精确匹配
 
 ## 本地文件筛选器
 
+### 基于文件名
+
+#### 自动匹配
+
+1. 把下好的压缩包放到与 local-ehentai.exe 同一文件夹下的 `files` 文件夹内, 也可以在里面创建子文件夹
+2. 重启 local-ehentai.exe
+
+#### 手动关联文件
+
+1. 编辑与 local-ehentai.exe 同一文件夹下的 `filesMap.txt`
+2. 语法: `文件名/gid`, 例: `abcd.zip/1234`
+3. 重启 local-ehentai.exe
+
 ### 基于URL
 
 1. 编辑与 local-ehentai.exe 同一文件夹下的 `existUrls.txt`
 2. 重启 local-ehentai.exe
-
-### 基于文件名
-
-TODO
-
 
 ## 启用本地缩略图缓存
 
@@ -88,6 +95,4 @@ TODO
 
 # 预览
 
-![Galleries](/assets/galleries_demo_v0.0.5_1.png)
-
-![Galleries](/assets/galleries_demo_v0.0.5.png)
+![Galleries](/assets/galleries_demo_v0.0.6.png)
