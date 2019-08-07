@@ -9,18 +9,6 @@ import (
 	"strings"
 )
 
-var indexFilesWinPathReplacer = strings.NewReplacer(
-	`/`, ``,
-	`\`, ``,
-	`:`, ``,
-	`*`, ``,
-	`?`, ``,
-	`"`, ``,
-	`<`, ``,
-	`>`, ``,
-	`|`, ``,
-)
-
 func indexFiles(dirPath string, mapPath string) (map[int][]string, error) {
 	// load map
 	fnMap, e := indexFileMap(mapPath)
@@ -112,15 +100,21 @@ func indexFiles(dirPath string, mapPath string) (map[int][]string, error) {
 }
 
 func indexFileMatchTitle(source, fn string) bool {
-	source = indexFilesWinPathReplacer.Replace(source)
-	fn = indexFilesWinPathReplacer.Replace(fn)
-	source = strings.Join(split(source, " "), " ")
-	fn = strings.Join(split(fn, " "), " ")
-	if strings.Contains(source, fn) {
-		return true
+	sources := strings.Split(source, "|")
+	if len(sources) > 1 {
+		sources = append(sources, source)
 	}
-	if strings.Contains(fn, source) {
-		return true
+	fn = indexWinPathReplacer.Replace(fn)
+	fn = strings.Join(split(fn, " "), " ")
+	for _, source := range sources {
+		source = indexWinPathReplacer.Replace(source)
+		source = strings.Join(split(source, " "), " ")
+		if strings.Contains(source, fn) {
+			return true
+		}
+		if strings.Contains(fn, source) {
+			return true
+		}
 	}
 	return false
 }

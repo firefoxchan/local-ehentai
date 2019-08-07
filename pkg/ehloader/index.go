@@ -81,6 +81,18 @@ func dumpTags() {
 	logger.Printf("Tag stats (> %d):\n%s", tagDumpMinLength, strings.Join(tagDumps, "\n"))
 }
 
+var indexWinPathReplacer = strings.NewReplacer(
+	`/`, ` `,
+	`\`, ` `,
+	`:`, ` `,
+	`*`, ` `,
+	`?`, ` `,
+	`"`, ` `,
+	`<`, ` `,
+	`>`, ` `,
+	`|`, ` `,
+)
+
 func handleJGallery(j JGallery) {
 	gallery := &Gallery{
 		GId:          j.GId,
@@ -158,11 +170,17 @@ func handleJGallery(j JGallery) {
 	}
 	// title
 	for _, rIdx := range rIdxTitleAll {
-		if gallery.TitleExt[rIdx] != "" {
-			appendTagKVG(TagKRIdxTitlePrefix+rIdx, gallery.TitleExt[rIdx], j.GId)
+		if v := gallery.TitleExt[rIdx]; v != "" {
+			appendTagKVG(TagKRIdxTitlePrefix+rIdx, v, j.GId)
+			if winV := indexWinPathReplacer.Replace(v); winV != v {
+				appendTagKVG(TagKRIdxTitlePrefix+rIdx, winV, j.GId)
+			}
 		}
-		if gallery.TitleJpnExt[rIdx] != "" {
-			appendTagKVG(TagKRIdxTitleJpnPrefix+rIdx, gallery.TitleJpnExt[rIdx], j.GId)
+		if v := gallery.TitleJpnExt[rIdx]; v != "" {
+			appendTagKVG(TagKRIdxTitleJpnPrefix+rIdx, v, j.GId)
+			if winV := indexWinPathReplacer.Replace(v); winV != v {
+				appendTagKVG(TagKRIdxTitleJpnPrefix+rIdx, winV, j.GId)
+			}
 		}
 	}
 	galleries[j.GId] = gallery
